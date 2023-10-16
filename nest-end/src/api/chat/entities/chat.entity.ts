@@ -1,0 +1,31 @@
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+
+@Entity('t_chat', { schema: 'aurora' })
+export class Chat {
+  @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
+  id: number;
+
+  @Column('varchar', { name: 'ip', comment: 'ip', length: 100 })
+  ip: string;
+
+  @Column('varchar', {
+    name: 'userId',
+    nullable: true,
+    comment: '用户id',
+    length: 100,
+  })
+  userId: number | null;
+
+  @Column('datetime', {
+    name: 'create_time',
+    comment: '发布于时间',
+  })
+  createTime: Date;
+
+  @Column('varchar', { name: 'content', comment: '内容', length: 255 })
+  content: string;
+
+  avatar: string;
+
+  nickname: string;
+}

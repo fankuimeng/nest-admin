@@ -1,0 +1,117 @@
+// @tailwind base;
+// @tailwind components;
+// @tailwind utilities;
+// @import "./theme-shoka.scss";
+ @import "./common.scss";
+// @import "./transition.scss";
+// @import "./markdown.scss";
+
+*,
+:after,
+:before {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Mulish, -apple-system, "PingFang SC", "Microsoft YaHei",
+    sans-serif;
+  font-size: 16px;
+  overflow-x: hidden;
+  line-height: 2;
+}
+
+a,
+button,
+img {
+  // cursor: url(https://ik.imagekit.io/nicexl/cursor/link.cur), default !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "NotoSerifSC", -apple-system, "Microsoft YaHei", sans-serif;
+  font-weight: 700;
+  line-height: 1.5;
+  margin: 1.25rem 0 0.9375rem;
+}
+
+button,
+input,
+select,
+textarea {
+  background-color: inherit;
+  border-style: none;
+}
+
+li {
+  list-style: none;
+}
+
+a {
+  border: none;
+  color: currentColor;
+  outline: 0;
+  text-decoration: none;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  transition: all 0.2s ease-in-out 0s;
+  cursor: pointer;
+}
+
+.clearfix:after {
+  visibility: hidden;
+  clear: both;
+  display: block;
+  content: ".";
+  height: 0;
+}
+
+.clearfix {
+  zoom: 1;
+}
+
+.mr-1 {
+  margin-right: 0.25rem /* 4px */;
+}
+.mr-2 {
+  margin-right: 0.5rem;
+}
+
+/* 滚动条*/
+::-webkit-scrollbar {
+  width: 0.5rem;
+  height: 0.5rem;
+}
+
+::-webkit-scrollbar-track {
+  border-radius: 2em;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: skyblue;
+  background-image: -webkit-linear-gradient(45deg,
+          hsla(0, 0%, 100%, 0.4) 25%,
+          transparent 0,
+          transparent 50%,
+          hsla(0, 0%, 100%, 0.4) 0,
+          hsla(0, 0%, 100%, 0.4) 75%,
+          transparent 0,
+          transparent);
+  border-radius: 2em;
+}
+
+::-webkit-scrollbar-corner {
+  background-color: transparent;
+}
+
+/* 加载进度条 */
+#nprogress .bar {
+  background: #e9546b !important;
+  height: 5px!important;
+
+}
