@@ -45,7 +45,7 @@ export class AuthController {
   async signin(@Body() userInfo: Partial<User>) {
     const { nickname, password } = userInfo;
     const data = await this.authService.signin(nickname, password);
-    return responseMessage(data, "用户登录成功");
+    return responseMessage(data, '用户登录成功');
   }
   //   @Get()
   //   findAll() {

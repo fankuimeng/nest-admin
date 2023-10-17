@@ -3,10 +3,12 @@ import {
   BeforeUpdate,
   Column,
   CreateDateColumn,
+  Entity,
   PrimaryGeneratedColumn,
   VersionColumn,
 } from 'typeorm';
 
+@Entity()
 export class BaseEntities {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id', comment: '唯一主键' })
   id: number;

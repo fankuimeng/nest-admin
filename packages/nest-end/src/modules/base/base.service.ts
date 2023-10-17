@@ -1,3 +1,4 @@
+import { resolve } from 'path';
 // BaseService.ts
 import {
   Repository,
@@ -11,11 +12,23 @@ import {
   ObjectId,
   SelectQueryBuilder,
   UpdateResult,
+  EntityManager,
+  Transaction,
+  getManager,
+  ObjectLiteral,
+  EntityTarget,
 } from 'typeorm';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
-import { Global, Injectable } from '@nestjs/common';
-import { InstanceEntities, PageQueryType } from 'src/typinng/global';
+import { Global, Inject, Injectable } from '@nestjs/common';
+import {
+  InstanceEntities,
+  PageQueryType,
+  ResponseModel,
+} from 'src/typinng/global';
 import Page from 'src/common/Page';
+import { InjectEntityManager } from '@nestjs/typeorm';
+import { User } from '../user/entities/user.entity';
+import { getRepositoryTransaction } from 'src/utils';
 
 export type ConditionsType<T> =
   | string
@@ -33,8 +46,26 @@ export type ConditionsType<T> =
  *
  */
 
-export abstract class BaseService<T> {
-  constructor(readonly repository: Repository<T>) {}
+export abstract class BaseService<T extends ObjectLiteral> {
+  @InjectEntityManager()
+  private manager: EntityManager;
+
+  transactionRepository: (
+    queryRunnerCallback: (
+      connectionTransaction: Repository<T>,
+    ) => ResponseModel<T>,
+  ) => ResponseModel<T>;
+
+  repository: Repository<T>;
+  constructor(private readonly entity: EntityTarget<T>) {
+    this.repository = this.manager.getRepository(entity);
+
+    getRepositoryTransaction(this.manager, entity).then(
+      (transactionRepository) => {
+        this.transactionRepository = transactionRepository;
+      },
+    );
+  }
   /**
    * 构造查询条件的钩子函数
    * @param query
@@ -75,9 +106,13 @@ export abstract class BaseService<T> {
   }
 
   async removeMany(entities: T[], options?: RemoveOptions): Promise<T[]> {
-    return this.repository.remove(entities, options);
+    return this.transactionRepository(async (repository) => {
+      const data = await repository.remove(entities, options);
+      return { data };
+    });
   }
 
+  // remove  和delete 区别：remove 查询数据在删除 删除级联关系,delete直接删表
   async delete(options?: ConditionsType<T>): Promise<DeleteResult> {
     return this.repository.delete(options);
   }

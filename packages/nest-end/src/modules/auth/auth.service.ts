@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { UserService } from '../user/user.service';
 
 @Injectable()
 export class AuthService {
   constructor(private readonly userService: UserService) {}
+
   async signin(nickname: string, password: string) {
     const userinfo = await this.userService.findOne({ where: { nickname } });
     const flag = await bcrypt.compare(password, userinfo.password);
@@ -35,6 +35,7 @@ export class AuthService {
   }
 
   findAll() {
+    this.userService.removeMany();
     return `This action returns all auth`;
   }
 
