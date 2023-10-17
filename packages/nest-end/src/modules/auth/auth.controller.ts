@@ -24,6 +24,7 @@ import { responseMessage } from 'src/utils';
 import { VerifyCodeResponseDto } from './dto';
 import * as svgCaptcha from 'svg-captcha';
 import { RedisService } from '../redis/redis.service';
+import { User } from '../user/entities/user.entity';
 
 @ApiTags('用户登录模块')
 @ApiHeader({
@@ -39,11 +40,13 @@ export class AuthController {
     private readonly redisService: RedisService,
   ) {}
 
-  //   @Post()
-  //   create(@Body() createAuthDto: CreateAuthDto) {
-  //     return this.authService.create(createAuthDto);
-  //   }
-
+  // 登录
+  @Post('signin')
+  async signin(@Body() userInfo: Partial<User>) {
+    const { nickname, password } = userInfo;
+    const data = await this.authService.signin(nickname, password);
+    return responseMessage(data, "用户登录成功");
+  }
   //   @Get()
   //   findAll() {
   //     return this.authService.findAll();

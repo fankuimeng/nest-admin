@@ -1,11 +1,3 @@
-/*
- * @Description: 接口代理
- * @Version: 2.0
- * @Author: Cyan
- * @Date: 2022-09-08 15:54:03
- * @LastEditors: Cyan
- * @LastEditTime: 2022-12-27 18:06:24
- */
 /**
  * @name 代理的配置
  * @see 在生产环境 代理是无法生效的，所以这里没有生产环境的配置
@@ -26,7 +18,7 @@ export default {
    */
   dev: {
     '/api/': {
-      target: ' http://127.0.0.1:3000', // 代理地址
+      target: ' http://127.0.0.1:6000', // 代理地址
       // 配置了这个可以从 http 代理到 https
       // 依赖 origin 的功能可能需要这个，比如 cookie
       changeOrigin: true,
