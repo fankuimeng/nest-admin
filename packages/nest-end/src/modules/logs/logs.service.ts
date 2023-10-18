@@ -7,8 +7,10 @@ import {
   LessThanOrEqual,
   Like,
   MoreThanOrEqual,
+  Repository,
   SelectQueryBuilder,
 } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class LogsService extends BaseService<Logs> {
@@ -24,7 +26,10 @@ export class LogsService extends BaseService<Logs> {
     });
   }
 
-  constructor() {
-    super(Logs);
+  constructor(
+    @InjectRepository(Logs)
+    private readonly repository: Repository<Logs>,
+  ) {
+    super(repository);
   }
 }

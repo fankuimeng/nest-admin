@@ -59,22 +59,24 @@ export type ConditionsType<T> =
 
 @Injectable()
 export abstract class BaseService<T extends ObjectLiteral> {
-  @InjectConnection()
-  private c;
   connectionTransaction: QueryRunner;
   transactionRepository: GetRepositoryTransactionReturnType<T>;
-  repository: Repository<T>;
 
-  constructor(private readonly entity: EntityTarget<T>) {
-    getConnectionTransaction().then((connectionTransaction: QueryRunner) => {
-      this.connectionTransaction = connectionTransaction;
-      this.repository = connectionTransaction.manager.getRepository(entity);
-      getRepositoryTransaction(connectionTransaction.manager, entity).then(
-        (transactionRepository: GetRepositoryTransactionReturnType<T>) => {
-          this.transactionRepository = transactionRepository;
-        },
-      );
-    });
+  constructor(private readonly repository: Repository<T>) {
+    getRepositoryTransaction(repository.manager).then(
+      (transactionRepository) => {
+        this.transactionRepository = transactionRepository;
+      },
+    );
+
+    // getConnectionTransaction().then((connectionTransaction: QueryRunner) => {
+    //   this.connectionTransaction = connectionTransaction;
+    //   getRepositoryTransaction(connectionTransaction.manager, entity).then(
+    //     (transactionRepository: GetRepositoryTransactionReturnType<T>) => {
+    //       this.transactionRepository = transactionRepository;
+    //     },
+    //   );
+    // });
     // getConnectionTransaction(entity).then(
     //   (connectionTransaction: GetRepositoryTransactionReturnType<T>) => {
     //     this.connectionTransaction = connectionTransaction;
