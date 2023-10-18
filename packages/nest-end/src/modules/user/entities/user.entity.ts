@@ -12,7 +12,7 @@ export class User extends BaseEntities {
   email: string | null;
 
   //电话号码
-  @Is({ args: /^1\d{10}$/, msg: '电话号码格式不正确' })
+  // @pa({ args: /^1\d{10}$/, msg: '电话号码格式不正确' })
   @Column('tinyint', {
     name: 'phone',
     width: 11,
@@ -85,10 +85,5 @@ export class User extends BaseEntities {
   //   menus: Menu[];
   //   resources: Resource[];
 }
-function Is(arg0: {
-  args: RegExp;
-  msg: string;
-}): (target: User, propertyKey: 'phone') => void {
-  throw new Error('Function not implemented.');
-}
+
 

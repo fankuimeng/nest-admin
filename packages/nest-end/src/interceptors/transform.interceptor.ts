@@ -1,11 +1,3 @@
-/*
- * @Description: 全局 拦截器 用来收集日志
- * @Version: 2.0
- 
- * @Date: 2022-10-16 22:04:12
- * @LastEditors: Cyan
- * @LastEditTime: 2022-10-18 10:41:04
- */
 import {
   CallHandler,
   ExecutionContext,

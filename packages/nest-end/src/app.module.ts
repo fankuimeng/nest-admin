@@ -11,8 +11,13 @@ import {
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { LoggerMiddleware } from './middleware/logger.middleware';
 import { JwtMiddleware } from './middleware/jwt.middleware';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { AllExceptionsFilter } from './filter/any-exception.filter';
+import { TransformInterceptor } from './interceptors/transform.interceptor';
 
-console.log('🚀 ~ file: app.module.ts:5 ~ exportModule:', exportModule);
+import { WinstonModule } from 'nest-winston';
+import * as winston from 'winston';
+import 'winston-daily-rotate-file';
 
 @Module({
   imports: [
@@ -21,11 +26,25 @@ console.log('🚀 ~ file: app.module.ts:5 ~ exportModule:', exportModule);
       isGlobal: true,
     }),
     TypeOrmModule.forRootAsync({
-      //   imports: [ConfigModule],
       useFactory: mysqlConfig,
       inject: [ConfigService], // 注入 ConfigService1 依赖
     }),
+    // WinstonModule.forRoot({
+    //   transports: mysqlConfig,
+    //   inject: [ConfigService]
+    // }),
     ...exportModule,
+  ],
+  providers: [
+    {
+      // 这样注册也是全局的
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: TransformInterceptor, // 全局拦截器，用来收集日志
+    },
   ],
 })
 export class AppModule implements NestModule {
@@ -39,12 +58,13 @@ export class AppModule implements NestModule {
       { path: 'comment', method: RequestMethod.ALL },
       { path: 'chat', method: RequestMethod.ALL },
     ); //解析请求的token
-    consumer.apply(LoggerMiddleware).forRoutes(
-      { path: '*', method: RequestMethod.POST },
-      {
-        path: '*',
-        method: RequestMethod.DELETE,
-      },
-    );
+
+    // consumer.apply(LoggerMiddleware).forRoutes(
+    //   { path: '*', method: RequestMethod.POST },
+    //   {
+    //     path: '*',
+    //     method: RequestMethod.DELETE,
+    //   },
+    // );
   }
 }

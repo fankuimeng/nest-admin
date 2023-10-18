@@ -1,11 +1,3 @@
-/*
- * @Description: 捕获所有异常
- * @Version: 2.0
- 
- * @Date: 2022-10-16 21:16:30
- * @LastEditors: Cyan
- * @LastEditTime: 2022-11-28 09:20:31
- */
 import {
   ArgumentsHost,
   Catch,
@@ -16,11 +8,20 @@ import {
 import { Logger } from '../utils/log4js'; // 打印日志
 import { responseMessage } from 'src/utils';
 
+export class AnyException {
+  message: string;
+  code: number;
+  constructor(message: string, code = HttpStatus.INTERNAL_SERVER_ERROR) {
+    this.message = message;
+    this.code = code;
+  }
+}
+
 // @Catch() 装饰器绑定所需的元数据到异常过滤器上。它告诉 Nest这个特定的过滤器正在寻找
-@Catch()
+@Catch(AnyException)
 export class AllExceptionsFilter implements ExceptionFilter {
   // ArgumentsHost叫做参数主机，它是一个实用的工具 这里我们使用 它的一个方法来获取上下文ctx
-  catch(exception: any, host: Partial<ArgumentsHost>) {
+  catch(exception: AnyException, host: Partial<ArgumentsHost>) {
     // 获取上下文
     const ctx = host.switchToHttp();
     // 获取响应体
@@ -31,7 +32,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const status =
       exception instanceof HttpException
         ? exception.getStatus()
-        : HttpStatus.INTERNAL_SERVER_ERROR;
+        : exception.code;
     // 打印日志
     const logFormat = `
         --------------------- 全局异常日志 ---------------------

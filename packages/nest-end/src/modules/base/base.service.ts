@@ -17,6 +17,8 @@ import {
   getManager,
   ObjectLiteral,
   EntityTarget,
+  QueryRunner,
+  getConnection,
 } from 'typeorm';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 import { Global, Inject, Injectable } from '@nestjs/common';
@@ -26,9 +28,18 @@ import {
   ResponseModel,
 } from 'src/typinng/global';
 import Page from 'src/common/Page';
-import { InjectEntityManager } from '@nestjs/typeorm';
+import {
+  InjectConnection,
+  InjectEntityManager,
+  InjectRepository,
+} from '@nestjs/typeorm';
 import { User } from '../user/entities/user.entity';
-import { getRepositoryTransaction } from 'src/utils';
+import async from '../../config/winston.config';
+import {
+  GetRepositoryTransactionReturnType,
+  getConnectionTransaction,
+  getRepositoryTransaction,
+} from '.';
 
 export type ConditionsType<T> =
   | string
@@ -46,25 +57,29 @@ export type ConditionsType<T> =
  *
  */
 
+@Injectable()
 export abstract class BaseService<T extends ObjectLiteral> {
-  @InjectEntityManager()
-  private manager: EntityManager;
-
-  transactionRepository: (
-    queryRunnerCallback: (
-      connectionTransaction: Repository<T>,
-    ) => ResponseModel<T>,
-  ) => ResponseModel<T>;
-
+  @InjectConnection()
+  private c;
+  connectionTransaction: QueryRunner;
+  transactionRepository: GetRepositoryTransactionReturnType<T>;
   repository: Repository<T>;
-  constructor(private readonly entity: EntityTarget<T>) {
-    this.repository = this.manager.getRepository(entity);
 
-    getRepositoryTransaction(this.manager, entity).then(
-      (transactionRepository) => {
-        this.transactionRepository = transactionRepository;
-      },
-    );
+  constructor(private readonly entity: EntityTarget<T>) {
+    getConnectionTransaction().then((connectionTransaction: QueryRunner) => {
+      this.connectionTransaction = connectionTransaction;
+      this.repository = connectionTransaction.manager.getRepository(entity);
+      getRepositoryTransaction(connectionTransaction.manager, entity).then(
+        (transactionRepository: GetRepositoryTransactionReturnType<T>) => {
+          this.transactionRepository = transactionRepository;
+        },
+      );
+    });
+    // getConnectionTransaction(entity).then(
+    //   (connectionTransaction: GetRepositoryTransactionReturnType<T>) => {
+    //     this.connectionTransaction = connectionTransaction;
+    //   },
+    // );
   }
   /**
    * 构造查询条件的钩子函数
@@ -76,13 +91,14 @@ export abstract class BaseService<T extends ObjectLiteral> {
   ): void;
 
   async saveOne(entity: T, options?: SaveOptions): Promise<T> {
-    return this.repository.save(entity, options);
+    return this.transactionRepository(async (repository) => {
+      const data = repository.save(entity, options);
+      return Promise.resolve(data);
+    });
   }
-
   async page(query: PageQueryType<T>): Promise<Page<T>> {
     // // 因为我需要的功能用mapper.find实现不了，所以采用createQueryBuilder
     let queryBuilder = this.repository.createQueryBuilder('t');
-    // // 引用传递
     this.generateWhere(query, queryBuilder);
     const { current, pageSize } = query;
     queryBuilder = queryBuilder.skip((current - 1) * pageSize).take(pageSize);
@@ -97,6 +113,7 @@ export abstract class BaseService<T extends ObjectLiteral> {
   async findOne(options?: FindOneOptions<T>): Promise<T> {
     return this.repository.findOne(options);
   }
+
   async findAll(options?: FindManyOptions<T>): Promise<T[]> {
     return this.repository.find(options);
   }
@@ -107,8 +124,8 @@ export abstract class BaseService<T extends ObjectLiteral> {
 
   async removeMany(entities: T[], options?: RemoveOptions): Promise<T[]> {
     return this.transactionRepository(async (repository) => {
-      const data = await repository.remove(entities, options);
-      return { data };
+      const data = repository.remove(entities, options);
+      return Promise.resolve(data);
     });
   }
 

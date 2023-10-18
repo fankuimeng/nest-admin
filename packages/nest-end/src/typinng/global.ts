@@ -1,6 +1,7 @@
 import { BaseEntities } from 'src/common/entities/BaseEntities';
 import { UserAttributes } from './system';
 import { type } from 'os';
+import { ListBaseDto } from 'src/modules/base/dto/list-base.dto';
 
 /**
  * @description: 动态对象属性
@@ -27,7 +28,7 @@ export type PageResModel<T> = {
 export type ResponseModel<T = ResData[]> = {
   code?: number;
   data: T;
-  msg?: string;
+  msg?: string | string[];
 };
 
 /**
@@ -42,7 +43,6 @@ export type SessionModel = {
 
 export type InstanceEntities<T, U = BaseEntities> = Partial<T> & Partial<U>;
 
-export type PageQueryType<T> = {
-  pageSize: number;
-  current: number;
-} & InstanceEntities<T>;
+export type PageQueryType<T, U = object> = ListBaseDto &
+  InstanceEntities<T> &
+  U;

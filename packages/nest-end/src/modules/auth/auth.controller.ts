@@ -45,7 +45,7 @@ export class AuthController {
   async signin(@Body() userInfo: Partial<User>) {
     const { nickname, password } = userInfo;
     const data = await this.authService.signin(nickname, password);
-    return responseMessage(data, '用户登录成功');
+    return responseMessage(data as any, '用户登录成功');
   }
   //   @Get()
   //   findAll() {
@@ -83,7 +83,7 @@ export class AuthController {
       background: '#fff',
     });
     req.session.verifyCode = captcha.text; //使用session保存验证，用于登陆时验证
-    this.redisService.setValue(`code:${captcha.text}`, captcha.text, 60);
+    // this.redisService.setValue(`code:${captcha.text}`, captcha.text, 60);
     res.set('Access-Control-Allow-Origin', '*'); // 允许所有域名进行跨域请求
     res.set('Cross-Origin-Opener-Policy', 'cross-origin');
     res.set('Cross-Origin-Resource-Policy', 'cross-origin');

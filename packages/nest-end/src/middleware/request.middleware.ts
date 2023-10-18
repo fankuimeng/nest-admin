@@ -1,11 +1,3 @@
-/*
- * @Description: 全局请求拦截中间件
- * @Version: 2.0
- 
- * @Date: 2023-04-13 20:28:08
- * @LastEditors: Cyan
- * @LastEditTime: 2023-07-11 11:09:14
- */
 import { NextFunction, Request, Response } from 'express';
 export function requestMiddleware(
   req: Request,

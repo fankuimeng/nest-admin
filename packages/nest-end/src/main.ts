@@ -16,11 +16,8 @@ import { HttpReqTransformInterceptor } from './interceptors/http-req.interceptor
 import { join } from 'path';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Logger } from './utils/log4js';
-import {
-  RpcArgumentsHost,
-  HttpArgumentsHost,
-  WsArgumentsHost,
-} from '@nestjs/common/interfaces';
+import { HttpArgumentsHost } from '@nestjs/common/interfaces';
+import { TimeoutInterceptor } from './interceptors/timeout.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -33,18 +30,22 @@ async function bootstrap() {
   // 通过 express.urlencoded() 这个中间件，来解析表单中的 url-encoded 格式的数据
   app.use(express.urlencoded({ extended: true }));
 
+  // 全局请求拦截中间件
+  // app.use(requestMiddleware);
+
   //日志相关
   app.use(logger); // 所有请求都打印日志
 
+  // 获取配置文件
   const configService = app.get(ConfigService);
 
   // 错误异常捕获 和 过滤处理
-  app.useGlobalFilters(new AllExceptionsFilter());
+  // app.useGlobalFilters(new AllExceptionsFilter());
   app.useGlobalFilters(new HttpExceptionFilter()); // 全局统一异常返回体
 
   // 全局响应拦截器，格式化返回体
+  app.useGlobalInterceptors(new TimeoutInterceptor()); // 请求超时
   app.useGlobalInterceptors(new HttpReqTransformInterceptor<ResponseModel>());
-  app.useGlobalInterceptors(new TransformInterceptor()); // 全局拦截器，用来收集日志
 
   app.useGlobalPipes(new ValidationPipe());
 

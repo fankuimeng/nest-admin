@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { BaseEntities } from '../entities/base.entity';
 
-export class createBaseDto extends BaseEntities {
+export class ListBaseDto {
   @ApiProperty({
     type: Number,
     description: '条数',

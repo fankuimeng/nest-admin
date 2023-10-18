@@ -4,7 +4,6 @@ import { UpdateRoleMenuDto } from './dto/update-role-menu.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RoleMenu } from './entities/role-menu.entity';
 import { Repository } from 'typeorm';
-import transformData from 'src/utils/transformData';
 
 @Injectable()
 export class RoleMenuService {
