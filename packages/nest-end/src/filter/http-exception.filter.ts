@@ -26,7 +26,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
     // 如果 response.message 是个数组，就返回 join 的结果，否则还是返回 exception.message
     const res = exception.getResponse() as { message: string[] };
 
-
     const logFormat = `
         --------------------- HTTP 异常日志 ---------------------
         Request original url: ${request.originalUrl}
@@ -40,6 +39,13 @@ export class HttpExceptionFilter implements ExceptionFilter {
     // 自定义异常返回体
     response
       .status(status)
-      .json(responseMessage(null, res.message.join ? res.message.join?.(): res.message , status));
+      .json(
+        responseMessage(
+          null,
+          null,
+          res.message.join ? res.message.join?.() : res.message,
+          status,
+        ),
+      );
   }
 }

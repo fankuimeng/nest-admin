@@ -27,6 +27,8 @@ export class TransformInterceptor implements NestInterceptor {
             `;
         Logger.info(logFormat);
         Logger.access(logFormat);
+        console.log('11111111111111111111111111111');
+
         return data;
       }),
     );

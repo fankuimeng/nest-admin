@@ -1,13 +1,22 @@
 import { Injectable } from '@nestjs/common';
 import { PageQueryType } from 'src/typinng/global';
-import { EntityTarget, SelectQueryBuilder } from 'typeorm';
+import {
+  EntityManager,
+  EntityTarget,
+  Repository,
+  SelectQueryBuilder,
+} from 'typeorm';
 import { User } from './entities/user.entity';
 import { BaseService } from '../base/base.service';
+import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class UserService extends BaseService<User> {
-  constructor() {
-    super(User);
+  constructor(
+    @InjectEntityManager()
+    private manager: EntityManager,
+  ) {
+    super(manager.getRepository(User));
   }
   generateWhere(
     query: PageQueryType<User>,

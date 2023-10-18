@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Query } from '@nestjs/common';
 import { LogsService } from './logs.service';
 import { responseMessage } from 'src/utils';
 import { PageQueryType } from 'src/typinng/global';
-import { Logs } from './entities/log.entity';
+import { Logs } from './entities/logs.entity';
 
 @Controller('logs')
 export class LogsController {

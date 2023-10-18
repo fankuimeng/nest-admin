@@ -1,11 +1,4 @@
-/*
- * @Description: 全局响应拦截器
- * @Version: 2.0
- 
- * @Date: 2022-10-14 09:58:57
- * @LastEditors: Cyan
- * @LastEditTime: 2022-11-28 10:47:38
- */
+import { LogsService } from './../modules/logs/logs.service';
 import {
   CallHandler,
   ExecutionContext,
@@ -22,18 +15,23 @@ import { responseMessage } from 'src/utils';
 export class HttpReqTransformInterceptor<T>
   implements NestInterceptor<T, ResponseModel>
 {
+  constructor(private logsService: LogsService) {}
+
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
       map((param) => {
         if (param instanceof Buffer) {
           return param;
         }
-        const { data, msg, code } = param;
+        const { data, msg, code, logContent } = param;
+
         /**
          * @description: response 将返回一个对象
          * @description: 报装返回体，设计返回的逻辑
          */
-        return responseMessage(data, msg, code);
+
+        logContent && this.logsService.saveLogs(logContent); // 保存操作日志 异常操作不管理
+        return responseMessage(data, null, msg, code);
       }),
     );
   }

@@ -8,7 +8,6 @@ import {
   VersionColumn,
 } from 'typeorm';
 
-@Entity()
 export class BaseEntities {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id', comment: '唯一主键' })
   id: number;
@@ -38,14 +37,14 @@ export class BaseEntities {
   @Column()
   isDelete!: number;
 
-  @BeforeUpdate()
-  updateUpdateBy() {
-    // console.log('before-update....');
-  }
+  //   @BeforeUpdate()
+  //   updateUpdateBy() {
+  //     // console.log('before-update....');
+  //   }
 
-  @BeforeInsert()
-  resetCounters() {
-    // this.state = 0
-    // console.log('before-insert....');
-  }
+  //   @BeforeInsert()
+  //   resetCounters() {
+  //     // this.state = 0
+  //     // console.log('before-insert....');
+  //   }
 }

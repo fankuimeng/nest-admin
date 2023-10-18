@@ -47,6 +47,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
     // 自定义异常返回体
     response
       .status(status)
-      .json(responseMessage(null, exception.message, status));
+      .json(responseMessage(null, null, exception.message, status));
   }
 }

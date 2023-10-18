@@ -2,6 +2,7 @@ import { BaseEntities } from 'src/common/entities/BaseEntities';
 import { UserAttributes } from './system';
 import { type } from 'os';
 import { ListBaseDto } from 'src/modules/base/dto/list-base.dto';
+import { User } from 'src/modules/user/entities/user.entity';
 
 /**
  * @description: 动态对象属性
@@ -29,6 +30,7 @@ export type ResponseModel<T = ResData[]> = {
   code?: number;
   data: T;
   msg?: string | string[];
+  logContent: string;
 };
 
 /**
@@ -37,7 +39,7 @@ export type ResponseModel<T = ResData[]> = {
  
  */
 export type SessionModel = {
-  currentUserInfo: UserAttributes; // 用户信息
+  currentUserInfo: User; // 用户信息
   verifyCode: string; // 验证码
 };
 

@@ -14,10 +14,13 @@ import { JwtMiddleware } from './middleware/jwt.middleware';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { AllExceptionsFilter } from './filter/any-exception.filter';
 import { TransformInterceptor } from './interceptors/transform.interceptor';
+import { LogsService } from './modules/logs/logs.service';
+import { HttpReqTransformInterceptor } from './interceptors/http-req.interceptor';
+import { ResponseModel } from './typinng/global';
 
-import { WinstonModule } from 'nest-winston';
-import * as winston from 'winston';
-import 'winston-daily-rotate-file';
+// import { WinstonModule } from 'nest-winston';
+// import * as winston from 'winston';
+// import 'winston-daily-rotate-file';
 
 @Module({
   imports: [
@@ -36,6 +39,7 @@ import 'winston-daily-rotate-file';
     ...exportModule,
   ],
   providers: [
+    LogsService,
     {
       // 这样注册也是全局的
       provide: APP_FILTER,
@@ -43,7 +47,7 @@ import 'winston-daily-rotate-file';
     },
     {
       provide: APP_INTERCEPTOR,
-      useClass: TransformInterceptor, // 全局拦截器，用来收集日志
+      useClass: HttpReqTransformInterceptor<ResponseModel>, // 全局拦截器，用来收集日志
     },
   ],
 })
@@ -58,13 +62,5 @@ export class AppModule implements NestModule {
       { path: 'comment', method: RequestMethod.ALL },
       { path: 'chat', method: RequestMethod.ALL },
     ); //解析请求的token
-
-    // consumer.apply(LoggerMiddleware).forRoutes(
-    //   { path: '*', method: RequestMethod.POST },
-    //   {
-    //     path: '*',
-    //     method: RequestMethod.DELETE,
-    //   },
-    // );
   }
 }

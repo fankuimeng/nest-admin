@@ -25,6 +25,7 @@ import { VerifyCodeResponseDto } from './dto';
 import * as svgCaptcha from 'svg-captcha';
 import { RedisService } from '../redis/redis.service';
 import { User } from '../user/entities/user.entity';
+import { RES_CODE, RES_MSG } from 'src/typinng/enum';
 
 @ApiTags('用户登录模块')
 @ApiHeader({
@@ -45,7 +46,7 @@ export class AuthController {
   async signin(@Body() userInfo: Partial<User>) {
     const { nickname, password } = userInfo;
     const data = await this.authService.signin(nickname, password);
-    return responseMessage(data as any, '用户登录成功');
+    return responseMessage({ data, msg: '用户登录成功' });
   }
   //   @Get()
   //   findAll() {
@@ -90,6 +91,6 @@ export class AuthController {
     // res.type('image/svg+xml'); //指定返回的类型
     res.type('svg');
 
-    return res.send(responseMessage(captcha.data)); //给页面返回一张图片
+    return responseMessage(captcha.data, '请求验证码'); //给页面返回一张图片
   }
 }

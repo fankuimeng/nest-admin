@@ -1,8 +1,11 @@
+import { IsEmail } from 'class-validator';
 import { BaseEntities } from 'src/common/entities/BaseEntities';
 import { Column, Entity } from 'typeorm';
 
+//  Contains, IsDate, IsEmail, IsFQDN, IsInt, Length, Max, Min;  class-validator
 @Entity('user_info')
 export class User extends BaseEntities {
+  @IsEmail()
   @Column('varchar', {
     name: 'email',
     nullable: true,
@@ -85,5 +88,3 @@ export class User extends BaseEntities {
   //   menus: Menu[];
   //   resources: Resource[];
 }
-
-

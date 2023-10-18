@@ -1,3 +1,3 @@
-import { Logs } from '../entities/log.entity';
+import { Logs } from '../entities/logs.entity';
 
 export class CreateLogDto extends Logs {}
