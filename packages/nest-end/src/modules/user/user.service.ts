@@ -11,12 +11,12 @@ import { BaseService } from '../base/base.service';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
-export class UserService extends BaseService<User> {
+export class UserService {
   constructor(
     @InjectEntityManager()
     private manager: EntityManager,
   ) {
-    super(manager.getRepository(User));
+    // super(manager.getRepository(User));
   }
   generateWhere(
     query: PageQueryType<User>,

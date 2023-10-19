@@ -30,7 +30,7 @@ export type ResponseModel<T = ResData[]> = {
   code?: number;
   data: T;
   msg?: string | string[];
-  logContent: string;
+  logContent?: string;
 };
 
 /**

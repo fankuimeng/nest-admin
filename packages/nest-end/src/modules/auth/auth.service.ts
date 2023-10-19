@@ -45,9 +45,9 @@ export class AuthService {
   //   const type = 'nickname' in user ? 'account' : 'mobile';
   //   // 查询条件
   //   const where = type === 'account' ? { nickname } : { phone };
-  //   // 查找用户
+  //    查找用户
   //   const userInfo = await this.userService.findOne({ where });
-  //   // 根据登录类型执行不同的处理
+  // 根据登录类型执行不同的处理
   //   switch (type) {
   //     // 用户名登录
   //     case 'account':

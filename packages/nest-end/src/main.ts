@@ -2,17 +2,13 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
-import { ExceptionLogService } from './api/exception-log/exception-log.service';
 import * as session from 'express-session';
-import { ContextType, HttpException, ValidationPipe } from '@nestjs/common';
+import { HttpException, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as express from 'express';
 import { logger } from './middleware/logger.middleware'; // 日志收集中间件
-import { AllExceptionsFilter } from './filter/any-exception.filter';
 import { HttpExceptionFilter } from './filter/http-exception.filter';
-import { ResponseModel } from './typinng/global';
 import { TransformInterceptor } from './interceptors/transform.interceptor';
-import { HttpReqTransformInterceptor } from './interceptors/http-req.interceptor';
 import { join } from 'path';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Logger } from './utils/log4js';
@@ -41,7 +37,7 @@ async function bootstrap() {
 
   // 错误异常捕获 和 过滤处理
   // app.useGlobalFilters(new AllExceptionsFilter());
-  app.useGlobalFilters(new HttpExceptionFilter()); // 全局统一异常返回体
+  // app.useGlobalFilters(new HttpExceptionFilter()); // 全局统一异常返回体
 
   // 全局响应拦截器，格式化返回体
   app.useGlobalInterceptors(new TimeoutInterceptor()); // 请求超时

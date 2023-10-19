@@ -13,9 +13,11 @@ import {
 import { InstanceEntities, PageQueryType } from 'src/typinng/global';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 import Page from 'src/common/Page';
+import { BaseService } from './base.service';
 
 export class BaseController<T> {
-  constructor(private readonly service: any) {}
+  constructor(private readonly service: BaseService<T>) {}
+
   @Get('page')
   async page(
     @Query() query: PageQueryType<InstanceEntities<T>>,
@@ -37,13 +39,13 @@ export class BaseController<T> {
     return this.service.findOne();
   }
 
-  @Patch(':id')
-  async update(
-    @Param('id') id: number,
-    @Body() updateUserDto: QueryDeepPartialEntity<InstanceEntities<T>>,
-  ) {
-    return this.service.update(id, updateUserDto);
-  }
+  // @Patch(':id')
+  // async update(
+  //   @Param('id') id: number,
+  //   @Body() updateUserDto: QueryDeepPartialEntity<InstanceEntities<T>>,
+  // ) {
+  //   return this.service.update(id, updateUserDto);
+  // }
 
   @Delete(':id')
   async remove(@Param('id') id: number) {

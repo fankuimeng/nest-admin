@@ -38,11 +38,12 @@ export type ConditionsType<T> =
  *
  */
 
-@Injectable()
 export abstract class BaseService<T extends ObjectLiteral> {
   transactionRepository: GetRepositoryTransactionReturnType<T>;
 
   constructor(private readonly repository: Repository<T>) {
+    console.log(this);
+
     getRepositoryTransaction(repository.manager).then(
       (transactionRepository) => {
         this.transactionRepository = transactionRepository;
@@ -62,6 +63,8 @@ export abstract class BaseService<T extends ObjectLiteral> {
     entity: Partial<T>,
     options?: SaveOptions,
   ): Promise<Partial<T>> {
+    console.log(this);
+
     return this.transactionRepository(async (repository) => {
       const data = repository.save(entity, options);
       return Promise.resolve(data);
@@ -69,7 +72,7 @@ export abstract class BaseService<T extends ObjectLiteral> {
   }
 
   async page(query: PageQueryType<T>): Promise<Page<T>> {
-    // // 因为我需要的功能用mapper.find实现不了，所以采用createQueryBuilder
+    //  因为我需要的功能用mapper.find实现不了，所以采用createQueryBuilder
     let queryBuilder = this.repository.createQueryBuilder('t');
     this.generateWhere(query, queryBuilder);
     const { current, pageSize } = query;

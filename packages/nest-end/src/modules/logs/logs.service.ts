@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Scope } from '@nestjs/common';
 import { BaseService } from '../base/base.service';
 import { Logs } from './entities/logs.entity';
 import { PageQueryType, SessionModel } from 'src/typinng/global';
@@ -10,10 +10,19 @@ import {
   SelectQueryBuilder,
 } from 'typeorm';
 import { InjectEntityManager } from '@nestjs/typeorm';
-import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
-@Injectable()
+import { RequestContext } from 'nestjs-request-context';
+
+@Injectable({ scope: Scope.REQUEST })
 export class LogsService extends BaseService<Logs> {
+  constructor(
+    @InjectEntityManager()
+    private manager: EntityManager,
+  ) {
+    const repository = manager.getRepository(Logs);
+    super(repository);
+  }
+
   generateWhere(
     query: PageQueryType<Logs>,
     queryBuilder: SelectQueryBuilder<Logs>,
@@ -25,21 +34,18 @@ export class LogsService extends BaseService<Logs> {
       endTime: LessThanOrEqual(end_time),
     });
   }
-  constructor(
-    @InjectEntityManager()
-    private manager: EntityManager,
-    @Inject(REQUEST)
-    private readonly request: Request & { session: SessionModel },
-  ) {
-    super(manager.getRepository(Logs));
-  }
 
   async saveLogs(content: string) {
-    const { url, method, headers, ip, body } = this.request;
-    const user_id = this.request.session.currentUserInfo.id;
-    if (user_id) return;
+    const request: Request & { session: SessionModel } =
+      RequestContext.currentContext.req;
+
+    const { url, method, headers, ip, body } = request;
+
+    const user_id = request.session?.currentUserInfo?.id;
+
+    // if (user_id) return;
     const logs: Partial<Logs> = {
-      user_id: this.request.session.currentUserInfo.id,
+      user_id: 56,
       content,
       ip,
       path: headers.referer,

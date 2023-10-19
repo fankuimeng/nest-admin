@@ -25,7 +25,6 @@ import { VerifyCodeResponseDto } from './dto';
 import * as svgCaptcha from 'svg-captcha';
 import { RedisService } from '../redis/redis.service';
 import { User } from '../user/entities/user.entity';
-import { RES_CODE, RES_MSG } from 'src/typinng/enum';
 
 @ApiTags('用户登录模块')
 @ApiHeader({
@@ -90,7 +89,6 @@ export class AuthController {
     res.set('Cross-Origin-Resource-Policy', 'cross-origin');
     // res.type('image/svg+xml'); //指定返回的类型
     res.type('svg');
-
-    return responseMessage(captcha.data, '请求验证码'); //给页面返回一张图片
+    return responseMessage(captcha.data, '生成验证码'); //给页面返回一张图片
   }
 }
