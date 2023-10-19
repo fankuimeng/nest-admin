@@ -2,12 +2,12 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsIP, IsNumber } from 'class-validator';
 import { BaseEntities } from 'src/modules/base/entities/base.entity';
 import { User } from 'src/modules/user/entities/user.entity';
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, BeforeUpdate } from 'typeorm';
 @Entity()
 export class Logs extends BaseEntities {
   // 日志内容
   @Column({ type: 'text', name: '日志内容' })
-  content!: string;
+  content?: string;
 
   // 前端路由
   @Column({
@@ -28,7 +28,7 @@ export class Logs extends BaseEntities {
     default: 'admin',
     required: false,
   })
-  @Column({ type: 'varchar', length: 50, comment: '用户名' })
+  @Column({ type: 'varchar', nullable: true, length: 50, comment: '用户名' })
   user_name?: string;
 
   // 代理

@@ -1,3 +1,5 @@
+import { IsNumber, IsOptional } from 'class-validator';
+import { RequestContext } from 'nestjs-request-context';
 import {
   BeforeInsert,
   BeforeUpdate,
@@ -5,11 +7,14 @@ import {
   CreateDateColumn,
   Entity,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
   VersionColumn,
 } from 'typeorm';
 
 export class BaseEntities {
-  @PrimaryGeneratedColumn({ type: 'int', name: 'id', comment: '唯一主键' })
+  @PrimaryGeneratedColumn()
+  @IsOptional()
+  @IsNumber()
   id: number;
 
   @CreateDateColumn({
@@ -17,34 +22,40 @@ export class BaseEntities {
   })
   createTime: Date;
 
-  @CreateDateColumn({
+  @UpdateDateColumn({
     comment: '更新时间',
   })
   updateTime: Date;
 
-  @Column({ name: 'create_by', update: false })
-  createBy!: string;
+  @Column({ name: 'create_by', update: false, nullable: true })
+  createBy?: string;
 
-  @Column({ name: 'update_by' })
-  updateBy!: string;
+  @Column({ name: 'update_by', nullable: true })
+  updateBy?: string;
 
   @Column({ type: 'varchar', nullable: true })
-  remark: string | undefined | null;
+  remark?: string | undefined | null;
 
-  @VersionColumn({ select: false })
-  version!: number;
+  @VersionColumn({ select: false, nullable: true })
+  version?: number;
 
-  @Column()
-  isDelete!: number;
+  @Column({
+    name: 'is_delete',
+    comment: '是否删除',
+    nullable: true,
+    default: 0,
+  })
+  isDelete?: number;
 
-  //   @BeforeUpdate()
-  //   updateUpdateBy() {
-  //     // console.log('before-update....');
-  //   }
+  @BeforeUpdate()
+  public beforeUpdate(...args) {
+    const request: Request = RequestContext.currentContext.req;
+    this.updateBy = request.url + 'mfk';
+  }
 
-  //   @BeforeInsert()
-  //   resetCounters() {
-  //     // this.state = 0
-  //     // console.log('before-insert....');
-  //   }
+  @BeforeInsert()
+  public beforeInsert(...args) {
+    const request: Request = RequestContext.currentContext.req;
+    this.createBy = 'mfk' + request.referrer;
+  }
 }

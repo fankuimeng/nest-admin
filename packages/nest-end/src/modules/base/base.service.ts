@@ -1,4 +1,3 @@
-import path, { resolve } from 'path';
 // BaseService.ts
 import {
   Repository,
@@ -14,13 +13,10 @@ import {
   ObjectLiteral,
 } from 'typeorm';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
-import { Injectable } from '@nestjs/common';
 import { PageQueryType } from 'src/typinng/global';
 import Page from 'src/common/Page';
-import {
-  GetRepositoryTransactionReturnType,
-  getRepositoryTransaction,
-} from '.';
+
+import { plainToClass } from 'class-transformer';
 
 export type ConditionsType<T> =
   | string
@@ -39,16 +35,14 @@ export type ConditionsType<T> =
  */
 
 export abstract class BaseService<T extends ObjectLiteral> {
-  transactionRepository: GetRepositoryTransactionReturnType<T>;
+  //   transactionRepository: GetRepositoryTransactionReturnType<T>;
 
   constructor(private readonly repository: Repository<T>) {
-    console.log(this);
-
-    getRepositoryTransaction(repository.manager).then(
-      (transactionRepository) => {
-        this.transactionRepository = transactionRepository;
-      },
-    );
+    // getRepositoryTransaction(repository.manager).then(
+    //   (transactionRepository) => {
+    //     this.transactionRepository = transactionRepository;
+    //   },
+    // );
   }
   /**
    * 构造查询条件的钩子函数
@@ -63,12 +57,7 @@ export abstract class BaseService<T extends ObjectLiteral> {
     entity: Partial<T>,
     options?: SaveOptions,
   ): Promise<Partial<T>> {
-    console.log(this);
-
-    return this.transactionRepository(async (repository) => {
-      const data = repository.save(entity, options);
-      return Promise.resolve(data);
-    });
+    return this.repository.save(this.repository.create(entity as T), options);
   }
 
   async page(query: PageQueryType<T>): Promise<Page<T>> {
@@ -81,8 +70,11 @@ export abstract class BaseService<T extends ObjectLiteral> {
     return new Page(current, pageSize, total, records);
   }
 
-  async saveMany(entities: T[], options?: SaveOptions): Promise<T[]> {
-    return this.repository.save(entities, options);
+  async saveMany(entities: Partial<T>[], options?: SaveOptions): Promise<T[]> {
+    return this.repository.save(
+      await this.repository.create(entities as T[]),
+      options,
+    );
   }
 
   async findOne(options?: FindOneOptions<T>): Promise<T> {
@@ -98,10 +90,7 @@ export abstract class BaseService<T extends ObjectLiteral> {
   }
 
   async removeMany(entities: T[], options?: RemoveOptions): Promise<T[]> {
-    return this.transactionRepository(async (repository) => {
-      const data = repository.remove(entities, options);
-      return Promise.resolve(data);
-    });
+    return this.repository.remove(entities, options);
   }
 
   // remove  和delete 区别：remove 查询数据在删除 删除级联关系,delete直接删表

@@ -12,8 +12,8 @@ import { User } from './entities/user.entity';
 import { BaseController } from '../base/base.controller';
 
 @Controller('user')
-export class UserController {
+export class UserController extends BaseController<User> {
   constructor(private readonly userService: UserService) {
-    // super(userService);
+    super(userService);
   }
 }

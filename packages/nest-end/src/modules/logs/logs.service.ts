@@ -13,7 +13,7 @@ import { InjectEntityManager } from '@nestjs/typeorm';
 import { Request } from 'express';
 import { RequestContext } from 'nestjs-request-context';
 
-@Injectable({ scope: Scope.REQUEST })
+@Injectable()
 export class LogsService extends BaseService<Logs> {
   constructor(
     @InjectEntityManager()
@@ -42,11 +42,9 @@ export class LogsService extends BaseService<Logs> {
     const { url, method, headers, ip, body } = request;
 
     const user_id = request.session?.currentUserInfo?.id;
-
-    // if (user_id) return;
+    if (user_id) return;
     const logs: Partial<Logs> = {
-      user_id: 56,
-      content,
+      content: content,
       ip,
       path: headers.referer,
       user_agent: headers['user-agent'],
