@@ -17,10 +17,9 @@ import { RequestContext } from 'nestjs-request-context';
 export class LogsService extends BaseService<Logs> {
   constructor(
     @InjectEntityManager()
-    private manager: EntityManager,
+    manager: EntityManager,
   ) {
-    const repository = manager.getRepository(Logs);
-    super(repository);
+    super(manager, Logs);
   }
 
   generateWhere(
@@ -44,7 +43,8 @@ export class LogsService extends BaseService<Logs> {
     const user_id = request.session?.currentUserInfo?.id;
     if (user_id) return;
     const logs: Partial<Logs> = {
-      content: content,
+      content: content + Math.random(),
+      id: 1,
       ip,
       path: headers.referer,
       user_agent: headers['user-agent'],
@@ -53,6 +53,10 @@ export class LogsService extends BaseService<Logs> {
       params: body,
     };
     // 将数据插入到表中
-    await this.saveOne(logs);
+    // await this.saveOne(logs);
+    await this.transactionRepository(async (entityManager) => {
+      const logss = [logs, { ...logs, id: 2 }];
+      await this.saveMany(logss);
+    });
   }
 }

@@ -14,9 +14,9 @@ import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 export class UserService extends BaseService<User> {
   constructor(
     @InjectEntityManager()
-    private manager: EntityManager,
+    manager: EntityManager,
   ) {
-    super(manager.getRepository(User));
+    super(manager, User);
   }
   generateWhere(
     query: PageQueryType<User>,

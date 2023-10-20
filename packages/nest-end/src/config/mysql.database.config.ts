@@ -14,7 +14,13 @@ export default async (
   entities: ['dist/modules/**/*.entity{.ts,.js}'],
   retryDelay: 500, //重试连接数据库间隔
   connectorPackage: 'mysql2',
+  // migrations:  迁移文件的路径或目录的路径，用于数据库迁移
   retryAttempts: 10, //重试连接数据库的次数
+  // 配置数据库时间为东八区北京时间
+  timezone: '+08:00',
+  dateStrings: true,
+  logging: false, // 布尔值或日志级别，表示是否启用查询日志记录。可以是 true（启用所有日志记录）、false（禁用日志记录）或 "all"、"error"、"warn"、"info"、"log"、"query"、"schema" 中的一个。
+  charset: 'utf8mb4',
   autoLoadEntities: true, //如果为true,将自动加载实体 forFeature()方法注册的每个实体都将自动添加到配置对象的实体数组中
   extra: {
     connectionLimit: 10,

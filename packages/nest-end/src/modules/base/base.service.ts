@@ -11,12 +11,18 @@ import {
   SelectQueryBuilder,
   UpdateResult,
   ObjectLiteral,
+  EntityManager,
+  EntityTarget,
 } from 'typeorm';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 import { PageQueryType } from 'src/typinng/global';
 import Page from 'src/common/Page';
 
-import { plainToClass } from 'class-transformer';
+import {
+  GetRepositoryTransactionReturnType,
+  getRepositoryTransaction,
+} from '.';
+import { Logs } from '../logs/entities/logs.entity';
 
 export type ConditionsType<T> =
   | string
@@ -35,14 +41,18 @@ export type ConditionsType<T> =
  */
 
 export abstract class BaseService<T extends ObjectLiteral> {
-  //   transactionRepository: GetRepositoryTransactionReturnType<T>;
-
-  constructor(private readonly repository: Repository<T>) {
-    // getRepositoryTransaction(repository.manager).then(
-    //   (transactionRepository) => {
-    //     this.transactionRepository = transactionRepository;
-    //   },
-    // );
+  transactionRepository: GetRepositoryTransactionReturnType<T>;
+  repository: Repository<T>;
+  constructor(
+    manager: EntityManager,
+    readonly entity: EntityTarget<T>,
+  ) {
+    this.repository = manager.getRepository(entity);
+    getRepositoryTransaction<T>(manager, entity).then(
+      (transactionRepository) => {
+        this.transactionRepository = transactionRepository;
+      },
+    );
   }
   /**
    * 构造查询条件的钩子函数
@@ -57,7 +67,10 @@ export abstract class BaseService<T extends ObjectLiteral> {
     entity: Partial<T>,
     options?: SaveOptions,
   ): Promise<Partial<T>> {
-    return this.repository.save(this.repository.create(entity as T), options);
+    return this.repository.save(
+      await this.repository.create(entity as T),
+      options,
+    );
   }
 
   async page(query: PageQueryType<T>): Promise<Page<T>> {

@@ -1,24 +1,40 @@
 import { HttpException } from '@nestjs/common';
-import {
-  EntityManager,
-} from 'typeorm';
+import { EntityManager, EntityTarget, Repository } from 'typeorm';
 
 export type GetRepositoryTransactionReturnType<T> = <U>(
-  connectionTransaction: (Repository: EntityManager) => Promise<U>,
+  connectionTransaction: (entityManager: Repository<T>) => Promise<U>,
+  options?: {
+    successCallback?: () => void;
+    errorCallback?: (error?: any) => any;
+    finallyCallback?: () => void;
+  },
 ) => Promise<U>;
 
 //  抛错自动事务回滚
 export const getRepositoryTransaction = async <T>(
   manager: EntityManager,
+  entity: EntityTarget<T>,
 ): Promise<GetRepositoryTransactionReturnType<T>> => {
-  return manager.transaction((entityManager) => {
-    return Promise.resolve(async (queryRunnerCallback) => {
-      try {
-        return queryRunnerCallback(entityManager);
-      } catch (error) {
-        throw new HttpException('数据库异常', -1);
-      }
-    });
+  return Promise.resolve(async (queryRunnerCallback, options) => {
+    const repository = manager.getRepository(entity);
+    const queryRunner = manager.connection.createQueryRunner();
+    queryRunner.startTransaction();
+    try {
+      const result = queryRunnerCallback(repository);
+      await queryRunner.commitTransaction();
+      options?.successCallback?.();
+      return result;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      const errorCallbackResult = options?.errorCallback?.();
+      throw new HttpException(
+        errorCallbackResult?.msg || '数据库异常',
+        errorCallbackResult?.code || -1,
+      );
+    } finally {
+      await queryRunner.release();
+      options?.finallyCallback?.();
+    }
   });
 };
 

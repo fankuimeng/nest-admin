@@ -1,13 +1,11 @@
 import { IsNumber, IsOptional } from 'class-validator';
+import * as dayjs from 'dayjs';
 import { RequestContext } from 'nestjs-request-context';
 import {
   BeforeInsert,
   BeforeUpdate,
   Column,
-  CreateDateColumn,
-  Entity,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
   VersionColumn,
 } from 'typeorm';
 
@@ -17,15 +15,21 @@ export class BaseEntities {
   @IsNumber()
   id: number;
 
-  @CreateDateColumn({
-    comment: '创建时间',
+  @Column({
+    name: 'create_time',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
   })
-  createTime: Date;
+  createTime: string;
 
-  @UpdateDateColumn({
+  @Column({
+    name: 'update_time',
     comment: '更新时间',
+    update: true,
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
   })
-  updateTime: Date;
+  updateTime: string;
 
   @Column({ name: 'create_by', update: false, nullable: true })
   createBy?: string;
@@ -47,15 +51,22 @@ export class BaseEntities {
   })
   isDelete?: number;
 
+  // 你可以在实体中定义具有任何名称的方法，并使用@BeforeUpdate标记它，并且 TypeORM 将在使用 repository/manager save更新现有实
+  // 体之前调用它。 但请记住，只有在模型中更改信息时才会出现这种情况。
+  // 如果运行save而不修改模型中的任何内容，
+
   @BeforeUpdate()
-  public beforeUpdate(...args) {
+  public beforeUpdate() {
     const request: Request = RequestContext.currentContext.req;
+    this.updateTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
     this.updateBy = request.url + 'mfk';
   }
-
   @BeforeInsert()
-  public beforeInsert(...args) {
+  public beforeInsert() {
     const request: Request = RequestContext.currentContext.req;
+    this.createTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
+    this.updateTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
     this.createBy = 'mfk' + request.referrer;
+    this.updateBy = request.url + 'mfk';
   }
 }
