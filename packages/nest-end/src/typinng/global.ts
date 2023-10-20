@@ -1,7 +1,7 @@
-import { BaseEntities } from 'src/common/entities/BaseEntities';
 import { UserAttributes } from './system';
 import { type } from 'os';
 import { ListBaseDto } from 'src/modules/base/dto/list-base.dto';
+import { BaseEntities } from 'src/modules/base/entities/base.entity';
 import { User } from 'src/modules/user/entities/user.entity';
 
 /**

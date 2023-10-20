@@ -17,6 +17,8 @@ import { ResponseModel } from './typinng/global';
 import { ResponseMessageService } from './modules/response-message.service';
 import { HttpExceptionFilter } from './filter/http-exception.filter';
 import { RequestContextModule } from 'nestjs-request-context';
+import { WinstonModule } from 'nest-winston';
+import winstonConfig from './config/winston.config';
 
 // import { WinstonModule } from 'nest-winston';
 // import * as winston from 'winston';
@@ -32,10 +34,10 @@ import { RequestContextModule } from 'nestjs-request-context';
       useFactory: mysqlConfig,
       inject: [ConfigService], // 注入 ConfigService1 依赖
     }),
-    // WinstonModule.forRoot({
-    //   transports: mysqlConfig,
-    //   inject: [ConfigService]
-    // }),
+    WinstonModule.forRootAsync({
+      useFactory: winstonConfig,
+      inject: [ConfigService], // 注入 ConfigService1 依赖
+    }),
     RequestContextModule,
     ...exportModule,
   ],

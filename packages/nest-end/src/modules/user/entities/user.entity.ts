@@ -1,5 +1,5 @@
 import { IsEmail } from 'class-validator';
-import { BaseEntities } from 'src/common/entities/BaseEntities';
+import { BaseEntities } from 'src/modules/base/entities/base.entity';
 import { Column, Entity } from 'typeorm';
 
 //  Contains, IsDate, IsEmail, IsFQDN, IsInt, Length, Max, Min;  class-validator

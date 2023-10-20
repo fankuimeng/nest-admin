@@ -6,7 +6,6 @@ import * as session from 'express-session';
 import { HttpException, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as express from 'express';
-import { logger } from './middleware/logger.middleware'; // 日志收集中间件
 import { HttpExceptionFilter } from './filter/http-exception.filter';
 import { TransformInterceptor } from './interceptors/transform.interceptor';
 import { join } from 'path';
@@ -30,7 +29,7 @@ async function bootstrap() {
   // app.use(requestMiddleware);
 
   //日志相关
-  app.use(logger); // 所有请求都打印日志
+  // app.use(logger); // 所有请求都打印日志
 
   // 获取配置文件
   const configService = app.get(ConfigService);

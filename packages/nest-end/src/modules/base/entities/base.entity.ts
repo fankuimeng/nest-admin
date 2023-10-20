@@ -34,6 +34,9 @@ export class BaseEntities {
   @Column({ name: 'create_by', update: false, nullable: true })
   createBy?: string;
 
+  @Column({ name: 'create_by', nullable: true })
+  name?: string;
+
   @Column({ name: 'update_by', nullable: true })
   updateBy?: string;
 
