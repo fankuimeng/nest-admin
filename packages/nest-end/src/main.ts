@@ -10,9 +10,9 @@ import { HttpExceptionFilter } from './filter/http-exception.filter';
 import { TransformInterceptor } from './interceptors/transform.interceptor';
 import { join } from 'path';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { Logger } from './utils/log4js';
 import { HttpArgumentsHost } from '@nestjs/common/interfaces';
 import { TimeoutInterceptor } from './interceptors/timeout.interceptor';
+import { LoggerService } from './modules/Logger/logger.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -33,7 +33,7 @@ async function bootstrap() {
 
   // 获取配置文件
   const configService = app.get(ConfigService);
-
+  const loggerService = app.get(LoggerService);
   // 错误异常捕获 和 过滤处理
   // app.useGlobalFilters(new AllExceptionsFilter());
   // app.useGlobalFilters(new HttpExceptionFilter()); // 全局统一异常返回体
@@ -41,7 +41,7 @@ async function bootstrap() {
   // 全局响应拦截器，格式化返回体
   app.useGlobalInterceptors(new TimeoutInterceptor()); // 请求超时
   //   app.useGlobalInterceptors(new HttpReqTransformInterceptor<ResponseModel>());
-  app.useGlobalInterceptors(new TransformInterceptor()); // 全局拦截器，用来收集日志
+  //   app.useGlobalInterceptors(new TransformInterceptor()); // 全局拦截器，用来收集日志
 
   // whitelist为true，这样只有用到class-validator里面的注解的属性才能被允许传入接口
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
@@ -95,7 +95,7 @@ async function bootstrap() {
   SwaggerModule.setup(process.env.SWAGGER_SETUP_PATH, app, document);
 
   await app.listen(configService.get('APP_PROT'), () => {
-    Logger.info(
+    loggerService.logger(
       `服务已经启动,接口请访问:http://www.localhost:${configService.get(
         'APP_PROT',
       )}`,

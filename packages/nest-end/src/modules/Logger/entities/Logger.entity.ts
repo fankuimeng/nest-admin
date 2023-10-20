@@ -4,7 +4,7 @@ import { BaseEntities } from 'src/modules/base/entities/base.entity';
 import { User } from 'src/modules/user/entities/user.entity';
 import { Column, Entity, JoinColumn, ManyToOne, BeforeUpdate } from 'typeorm';
 @Entity()
-export class Logs extends BaseEntities {
+export class Logger extends BaseEntities {
   // 日志内容
   @Column({ type: 'text', name: 'content', comment: '日志内容' })
   content?: string;
@@ -51,7 +51,9 @@ export class Logs extends BaseEntities {
   @JoinColumn()
   user_id: number;
 
-  @JoinColumn()
+  @JoinColumn({
+    name: 'user_id',
+  })
   @ManyToOne(() => User, {
     cascade: true,
   }) // 定义多对一关系。注意使用BelongsTo是多对一关系的【多】表

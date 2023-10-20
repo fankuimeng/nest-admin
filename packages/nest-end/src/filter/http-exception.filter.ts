@@ -7,14 +7,13 @@ import {
   Inject,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { Logger } from '../utils/log4js'; // 打印日志
-import { ResponseMessageService } from 'src/modules/response-message.service';
+import { LoggerService } from 'src/modules/Logger/logger.service';
 
 // @Catch() 装饰器绑定所需的元数据到异常过滤器上。它告诉 Nest这个特定的过滤器正在寻找
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
-  @Inject(ResponseMessageService)
-  private responseMessageService: ResponseMessageService;
+  @Inject(LoggerService)
+  private loggerService: LoggerService;
   // ArgumentsHost叫做参数主机，它是一个实用的工具 这里我们使用 它的一个方法来获取上下文ctx
   catch(exception: HttpException, host: Partial<ArgumentsHost>) {
     // 获取上下文
@@ -39,14 +38,13 @@ export class HttpExceptionFilter implements ExceptionFilter {
         Response: ${res.message}
         --------------------- HTTP 异常日志 ---------------------
         `;
-    Logger.info(logFormat);
+    this.loggerService.logger(logFormat, 'error');
 
-  
     // 自定义异常返回体
     response
       .status(status)
       .json(
-        this.responseMessageService.responseMessage(
+        this.loggerService.responseMessage(
           null,
           null,
           res.message.join ? res.message.join?.() : res.message,

@@ -1,6 +1,7 @@
 import { IsEmail } from 'class-validator';
+import { Logger } from 'src/modules/Logger/entities/Logger.entity';
 import { BaseEntities } from 'src/modules/base/entities/base.entity';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
 
 //  Contains, IsDate, IsEmail, IsFQDN, IsInt, Length, Max, Min;  class-validator
 @Entity('user_info')
@@ -62,6 +63,9 @@ export class User extends BaseEntities {
     default: 0,
   })
   isDisable: number;
+
+  @OneToMany(() => Logger, (logger) => logger.user_id)
+  loggers: Logger[];
 
   //   @OneToMany(() => Comment, (comment) => comment.userinfo)
   //   comments: Comment[];

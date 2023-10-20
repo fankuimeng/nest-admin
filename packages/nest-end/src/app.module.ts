@@ -11,14 +11,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtMiddleware } from './middleware/jwt.middleware';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { AllExceptionsFilter } from './filter/any-exception.filter';
-import { LogsService } from './modules/logs/logs.service';
 import { HttpReqTransformInterceptor } from './interceptors/http-req.interceptor';
 import { ResponseModel } from './typinng/global';
-import { ResponseMessageService } from './modules/response-message.service';
 import { HttpExceptionFilter } from './filter/http-exception.filter';
 import { RequestContextModule } from 'nestjs-request-context';
 import { WinstonModule } from 'nest-winston';
 import winstonConfig from './config/winston.config';
+import { LoggerService } from './modules/Logger/logger.service';
 
 // import { WinstonModule } from 'nest-winston';
 // import * as winston from 'winston';
@@ -34,17 +33,16 @@ import winstonConfig from './config/winston.config';
       useFactory: mysqlConfig,
       inject: [ConfigService], // 注入 ConfigService1 依赖
     }),
-    WinstonModule.forRootAsync({
-      useFactory: winstonConfig,
-      inject: [ConfigService], // 注入 ConfigService1 依赖
-    }),
+    // WinstonModule.forRootAsync({
+    //   useFactory: winstonConfig,
+    //   inject: [ConfigService], // 注入 ConfigService1 依赖
+    // }),
     RequestContextModule,
     ...exportModule,
   ],
-  exports: [ResponseMessageService],
+  exports: [],
   providers: [
-    LogsService,
-    ResponseMessageService,
+    LoggerService,
     {
       // 这样注册也是全局的
       provide: APP_FILTER,

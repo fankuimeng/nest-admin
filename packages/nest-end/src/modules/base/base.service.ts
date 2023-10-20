@@ -22,7 +22,6 @@ import {
   GetRepositoryTransactionReturnType,
   getRepositoryTransaction,
 } from '.';
-import { Logs } from '../logs/entities/logs.entity';
 
 export type ConditionsType<T> =
   | string

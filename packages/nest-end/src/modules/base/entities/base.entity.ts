@@ -8,7 +8,7 @@ import {
   PrimaryGeneratedColumn,
   VersionColumn,
 } from 'typeorm';
-
+import { Request } from 'express';
 export class BaseEntities {
   @PrimaryGeneratedColumn()
   @IsOptional()
@@ -34,7 +34,7 @@ export class BaseEntities {
   @Column({ name: 'create_by', update: false, nullable: true })
   createBy?: string;
 
-  @Column({ name: 'create_by', nullable: true })
+  @Column({ nullable: true })
   name?: string;
 
   @Column({ name: 'update_by', nullable: true })
@@ -69,7 +69,7 @@ export class BaseEntities {
     const request: Request = RequestContext.currentContext.req;
     this.createTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
     this.updateTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
-    this.createBy = 'mfk' + request.referrer;
+    this.createBy = 'mfk' + request.path;
     this.updateBy = request.url + 'mfk';
   }
 }

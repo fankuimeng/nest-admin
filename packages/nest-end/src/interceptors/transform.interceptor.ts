@@ -1,15 +1,18 @@
 import {
   CallHandler,
   ExecutionContext,
+  Inject,
   Injectable,
   NestInterceptor,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { Logger } from '../utils/log4js';
+import { LoggerService } from 'src/modules/Logger/logger.service';
 
 @Injectable()
 export class TransformInterceptor implements NestInterceptor {
+  @Inject(LoggerService)
+  private loggerService: LoggerService;
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const { originalUrl, method, ip, params, query, body } =
       context.getArgByIndex(1).req;
@@ -25,8 +28,7 @@ export class TransformInterceptor implements NestInterceptor {
             Body: ${JSON.stringify(body)} 
             --------------------- TransformInterceptor 日志 ---------------------
             `;
-        Logger.info(logFormat);
-        Logger.access(logFormat);
+        this.loggerService.logger(logFormat);
         return data;
       }),
     );

@@ -6,9 +6,8 @@ import {
   HttpStatus,
   Inject,
 } from '@nestjs/common';
-import { Logger } from '../utils/log4js'; // 打印日志
-import { responseMessage } from 'src/utils';
-import { ResponseMessageService } from 'src/modules/response-message.service';
+import dayjs from 'dayjs';
+import { LoggerService } from 'src/modules/Logger/logger.service';
 
 export class AnyException {
   message: string;
@@ -22,8 +21,8 @@ export class AnyException {
 // @Catch() 装饰器绑定所需的元数据到异常过滤器上。它告诉 Nest这个特定的过滤器正在寻找
 @Catch(AnyException)
 export class AllExceptionsFilter implements ExceptionFilter {
-  @Inject(ResponseMessageService)
-  private responseMessageService: ResponseMessageService;
+  @Inject(LoggerService)
+  private loggerService: LoggerService;
   // ArgumentsHost叫做参数主机，它是一个实用的工具 这里我们使用 它的一个方法来获取上下文ctx
   catch(exception: AnyException, host: Partial<ArgumentsHost>) {
     // 获取上下文
@@ -47,12 +46,12 @@ export class AllExceptionsFilter implements ExceptionFilter {
         Response: ${exception} 
         --------------------- 全局异常日志 ---------------------
         `;
-    Logger.error(logFormat);
-    // 自定义异常返回体
+    this.loggerService.logger(logFormat, 'error');
+    // 自定义异常返回体logFormat
     response
       .status(status)
       .json(
-        this.responseMessageService.responseMessage(
+        this.loggerService.responseMessage(
           null,
           null,
           exception.message,
