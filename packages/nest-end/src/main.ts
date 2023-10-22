@@ -41,7 +41,6 @@ async function bootstrap() {
   // 全局响应拦截器，格式化返回体
   app.useGlobalInterceptors(new TimeoutInterceptor()); // 请求超时
   //   app.useGlobalInterceptors(new HttpReqTransformInterceptor<ResponseModel>());
-  //   app.useGlobalInterceptors(new TransformInterceptor()); // 全局拦截器，用来收集日志
 
   // whitelist为true，这样只有用到class-validator里面的注解的属性才能被允许传入接口
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));

@@ -24,19 +24,7 @@ export class HttpReqTransformInterceptor<T>
       map((param) => {
         const ctx = context.switchToHttp();
         // 获取响应体
-        const response = ctx.getResponse();
-        const request = ctx.getRequest();
 
-        const logFormat = `
-        --------------------- 全局响应成功日志 ---------------------
-        Request original url: ${request.originalUrl}
-        Method: ${request.method}
-        IP: ${request.ip}
-        Message:${param instanceof Buffer ? '资源下载' : param?.message}
-        Response: ${JSON.stringify(param)} 
-        --------------------- 全局响应成功日志 ---------------------
-        `;
-        this.loggerService.logger(logFormat, 'debug');
         if (param instanceof Buffer) {
           return param;
         }
@@ -45,9 +33,7 @@ export class HttpReqTransformInterceptor<T>
          * @description: response 将返回一个对象
          * @description: 报装返回体，设计返回的逻辑
          */
-        return response.json(
-          this.loggerService.responseMessage(data, logContent, msg, code),
-        );
+        return this.loggerService.responseMessage(data, logContent, msg, code);
       }),
     );
   }

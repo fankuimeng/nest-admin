@@ -20,6 +20,7 @@ import Page from 'src/common/Page';
 
 import {
   GetRepositoryTransactionReturnType,
+  TransactionRepositoryOptions,
   getRepositoryTransaction,
 } from '.';
 
@@ -64,12 +65,15 @@ export abstract class BaseService<T extends ObjectLiteral> {
 
   async saveOne(
     entity: Partial<T>,
-    options?: SaveOptions,
+    options?: SaveOptions & TransactionRepositoryOptions,
   ): Promise<Partial<T>> {
-    return this.repository.save(
-      await this.repository.create(entity as T),
-      options,
-    );
+    return this.transactionRepository(async (entityManager) => {
+      const data = entityManager.save(
+        this.repository.create(entity as T),
+        options,
+      );
+      return Promise.resolve(data);
+    }, options);
   }
 
   async page(query: PageQueryType<T>): Promise<Page<T>> {
@@ -82,11 +86,17 @@ export abstract class BaseService<T extends ObjectLiteral> {
     return new Page(current, pageSize, total, records);
   }
 
-  async saveMany(entities: Partial<T>[], options?: SaveOptions): Promise<T[]> {
-    return this.repository.save(
-      await this.repository.create(entities as T[]),
-      options,
-    );
+  async saveMany(
+    entities: Partial<T>[],
+    options?: SaveOptions & TransactionRepositoryOptions,
+  ): Promise<T[]> {
+    return this.transactionRepository(async (entityManager) => {
+      const data = entityManager.save(
+        this.repository.create(entities as T[]),
+        options,
+      );
+      return Promise.resolve(data);
+    }, options);
   }
 
   async findOne(options?: FindOneOptions<T>): Promise<T> {

@@ -1,13 +1,23 @@
 import { HttpException } from '@nestjs/common';
+import { HttpError } from 'src/common/exception';
+import { responseMessage } from 'src/utils';
 import { EntityManager, EntityTarget, Repository } from 'typeorm';
 
-export type GetRepositoryTransactionReturnType<T> = <U>(
+export type TransactionRepositoryOptions<T = {}> = T & {
+  successCallback?: (result?: any) => any;
+  errorCallback?: (error?: any) => any;
+  finallyCallback?: () => void;
+  errorMsg?: string;
+  errorLog?: string;
+  successLog?: string;
+  errorCode?: number;
+  successCode?: number;
+  successMsg?: string;
+};
+
+export type GetRepositoryTransactionReturnType<T> = <U = any>(
   connectionTransaction: (entityManager: Repository<T>) => Promise<U>,
-  options?: {
-    successCallback?: () => void;
-    errorCallback?: (error?: any) => any;
-    finallyCallback?: () => void;
-  },
+  options?: TransactionRepositoryOptions,
 ) => Promise<U>;
 
 //  抛错自动事务回滚
@@ -20,16 +30,28 @@ export const getRepositoryTransaction = async <T>(
     const queryRunner = manager.connection.createQueryRunner();
     queryRunner.startTransaction();
     try {
-      const result = queryRunnerCallback(repository);
+      const result = await queryRunnerCallback(repository);
       await queryRunner.commitTransaction();
-      options?.successCallback?.();
-      return result;
+      const res = options?.successCallback
+        ? options?.successCallback?.(result)
+        : options.successMsg
+        ? responseMessage(
+            result,
+            options.successLog,
+            options.successMsg,
+            options.successCode,
+          )
+        : result;
+      return res;
     } catch (error) {
+      const errorCallbackResult = options?.errorCallback?.(error) || {
+        msg: options?.errorMsg,
+        code: options?.errorCode || -1,
+      };
       await queryRunner.rollbackTransaction();
-      const errorCallbackResult = options?.errorCallback?.();
-      throw new HttpException(
-        errorCallbackResult?.msg || '数据库异常',
-        errorCallbackResult?.code || -1,
+      throw new HttpError(
+        errorCallbackResult.msg || error.message,
+        errorCallbackResult?.code,
       );
     } finally {
       await queryRunner.release();
@@ -37,8 +59,6 @@ export const getRepositoryTransaction = async <T>(
     }
   });
 };
-
-
 
 //  手动动事务回滚
 // export const getConnectionTransaction = async <T>(

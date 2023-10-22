@@ -1,5 +1,6 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
+import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
 export default async (
   configService: ConfigService,
@@ -14,6 +15,8 @@ export default async (
   entities: ['dist/modules/**/*.entity{.ts,.js}'],
   retryDelay: 500, //重试连接数据库间隔
   connectorPackage: 'mysql2',
+  namingStrategy: new SnakeNamingStrategy(),
+
   // migrations:  迁移文件的路径或目录的路径，用于数据库迁移
   retryAttempts: 10, //重试连接数据库的次数
   // 配置数据库时间为东八区北京时间

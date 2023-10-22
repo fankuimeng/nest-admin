@@ -13,13 +13,19 @@ export class registerError extends HttpException {
 }
 
 export class tokenError extends HttpException {
-  constructor(message:string) {
-    super(message,HttpStatus.EXPECTATION_FAILED);
+  constructor(message: string) {
+    super(message, HttpStatus.EXPECTATION_FAILED);
   }
 }
 
 export class resourcePermission extends HttpException {
   constructor(message: string) {
     super(message, HttpStatus.FORBIDDEN);
+  }
+}
+
+export class HttpError extends HttpException {
+  constructor(message: string, status) {
+    super({ message }, status);
   }
 }

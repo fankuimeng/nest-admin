@@ -18,6 +18,8 @@ import { RequestContextModule } from 'nestjs-request-context';
 import { WinstonModule } from 'nest-winston';
 import winstonConfig from './config/winston.config';
 import { LoggerService } from './modules/Logger/logger.service';
+import { TransformInterceptor } from './interceptors/transform.interceptor';
+import { JwtModule } from '@nestjs/jwt';
 
 // import { WinstonModule } from 'nest-winston';
 // import * as winston from 'winston';
@@ -33,10 +35,7 @@ import { LoggerService } from './modules/Logger/logger.service';
       useFactory: mysqlConfig,
       inject: [ConfigService], // 注入 ConfigService1 依赖
     }),
-    // WinstonModule.forRootAsync({
-    //   useFactory: winstonConfig,
-    //   inject: [ConfigService], // 注入 ConfigService1 依赖
-    // }),
+
     RequestContextModule,
     ...exportModule,
   ],
@@ -53,22 +52,29 @@ import { LoggerService } from './modules/Logger/logger.service';
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
     },
+
     {
       provide: APP_INTERCEPTOR,
       useClass: HttpReqTransformInterceptor<ResponseModel>, // 全局拦截器，用来收集日志
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: TransformInterceptor,
     },
   ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(JwtMiddleware).forRoutes(
-      { path: 'userinfo/self', method: RequestMethod.ALL },
-      {
-        path: 'talkcomment',
-        method: RequestMethod.ALL,
-      },
-      { path: 'comment', method: RequestMethod.ALL },
-      { path: 'chat', method: RequestMethod.ALL },
-    ); //解析请求的token
+    consumer
+      .apply(JwtMiddleware)
+      .forRoutes
+      //   { path: 'userinfo/self', method: RequestMethod.ALL },
+      //   {
+      //     path: 'talkcomment',
+      //     method: RequestMethod.ALL,
+      //   },
+      //   { path: 'comment', method: RequestMethod.ALL },
+      //   { path: 'chat', method: RequestMethod.ALL },
+      (); //解析请求的token
   }
 }

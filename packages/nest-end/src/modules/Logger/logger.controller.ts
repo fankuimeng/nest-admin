@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Query } from '@nestjs/common';
 import { BaseController } from '../base/base.controller';
-import { Logger } from './entities/Logger.entity';
+import { Logger } from './entities/logger.entity';
 import { LoggerService } from './logger.service';
 
 @Controller('logger')

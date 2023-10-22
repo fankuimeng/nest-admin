@@ -13,20 +13,21 @@ import {
   timeout,
   TimeoutError,
 } from 'rxjs';
-import { AnyException } from 'src/filter/any-exception.filter';
 
 @Injectable()
 export class TimeoutInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
-      timeout(3000),
+      timeout(1000 * 60),
       catchError((err) => {
         if (err instanceof TimeoutError) {
           return throwError(
-            () => new HttpException('请求超时', HttpStatus.FOUND),
+            () =>
+              new HttpException({ message: "'请求超时'" }, HttpStatus.FOUND),
           );
         }
-        return throwError(() => new AnyException('请求异常'));
+
+        return throwError(() => new HttpException(err.response, err.status));
       }),
     );
   }

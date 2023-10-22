@@ -9,10 +9,9 @@ import {
   Session,
   Res,
   Req,
+  Query,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
 import {
   ApiBearerAuth,
   ApiHeader,
@@ -21,10 +20,18 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { responseMessage } from 'src/utils';
-import { VerifyCodeResponseDto } from './dto';
 import * as svgCaptcha from 'svg-captcha';
 import { RedisService } from '../redis/redis.service';
 import { User } from '../user/entities/user.entity';
+import { EmailService } from '../common/email.service';
+import {
+  AdminLoginResponseDto,
+  LoginDto,
+  UserLoginDto,
+  UserRegisterDto,
+  VerifyCodeResponseDto,
+} from './typing/user';
+import { ResponseDto } from 'src/dto/response.dto';
 
 @ApiTags('用户登录模块')
 @ApiHeader({
@@ -38,34 +45,8 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly redisService: RedisService,
+    private readonly emailService: EmailService,
   ) {}
-
-  // 登录
-  @Post('signin')
-  async signin(@Body() userInfo: Partial<User>) {
-    const { nickname, password } = userInfo;
-    const data = await this.authService.signin(nickname, password);
-    return responseMessage({ data, msg: '用户登录成功' });
-  }
-  //   @Get()
-  //   findAll() {
-  //     return this.authService.findAll();
-  //   }
-
-  //   @Get(':id')
-  //   findOne(@Param('id') id: string) {
-  //     return this.authService.findOne(+id);
-  //   }
-
-  //   @Patch(':id')
-  //   update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-  //     return this.authService.update(+id, updateAuthDto);
-  //   }
-
-  //   @Delete(':id')
-  //   remove(@Param('id') id: string) {
-  //     return this.authService.remove(+id);
-  //   }
 
   @ApiOkResponse({ type: VerifyCodeResponseDto })
   @ApiOperation({ summary: '获取图形验证码' })
@@ -89,6 +70,38 @@ export class AuthController {
     res.set('Cross-Origin-Resource-Policy', 'cross-origin');
     // res.type('image/svg+xml'); //指定返回的类型
     res.type('svg');
-    return responseMessage(captcha.data, '生成验证码'); //给页面返回一张图片
+    return await responseMessage(captcha.data); //给页面返回一张图片
+  }
+
+  @Post('register')
+  async register(@Body() registerUser: UserRegisterDto) {
+    return this.authService.register(registerUser);
+  }
+
+  @ApiOkResponse({ type: ResponseDto })
+  @ApiOperation({ summary: '获取邮箱验证码' })
+  @Get('register-captcha')
+  async captcha(@Query('address') address: string) {
+    const code = Math.random().toString().slice(2, 8);
+    this.redisService.setValue(`captcha_${address}`, code, 5 * 60);
+    await this.emailService.sendMail({
+      to: address,
+      subject: '注册验证码',
+      html: `<p>你的注册验证码是 ${code}</p>`,
+    });
+    return responseMessage(null, null, '发送邮件成功');
+  }
+
+  // 登录
+  @ApiOkResponse({ type: AdminLoginResponseDto })
+  @ApiOperation({ summary: '获取登录后的用户权限信息' })
+  @Post('login')
+  async signin(@Body() userInfo: UserLoginDto) {
+    return await this.authService.login(userInfo);
+  }
+
+  @Get('refresh')
+  async refresh(@Query('refreshToken') refreshToken: string) {
+    return this.authService.refresh(refreshToken);
   }
 }

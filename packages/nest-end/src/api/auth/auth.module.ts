@@ -6,11 +6,11 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 import { JwtStrategy } from './auth.strategy';
-import {ResourceModule} from "../resource/resource.module";
-import {MenuModule} from "../menu/menu.module";
-import {RoleResourceModule} from "../role-resource/role-resource.module";
-import {RedisModule} from "../redis/redis.module";
-import {RoleMenuModule} from "../role-menu/role-menu.module";
+import { ResourceModule } from '../resource/resource.module';
+import { MenuModule } from '../menu/menu.module';
+import { RoleResourceModule } from '../role-resource/role-resource.module';
+import { RedisModule } from '../redis/redis.module';
+import { RoleMenuModule } from '../role-menu/role-menu.module';
 
 @Module({
   imports: [
@@ -28,6 +28,6 @@ import {RoleMenuModule} from "../role-menu/role-menu.module";
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
-  exports:[AuthService]
+  exports: [AuthService],
 })
 export class AuthModule {}

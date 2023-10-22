@@ -1,12 +1,20 @@
-import { IsEmail } from 'class-validator';
-import { Logger } from 'src/modules/Logger/entities/Logger.entity';
+import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
 import { BaseEntities } from 'src/modules/base/entities/base.entity';
-import { Column, Entity, OneToMany } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, OneToMany } from 'typeorm';
+import { Role } from './role.entity';
 
 //  Contains, IsDate, IsEmail, IsFQDN, IsInt, Length, Max, Min;  class-validator
-@Entity('user_info')
+@Entity()
 export class User extends BaseEntities {
-  @IsEmail()
+  @IsNotEmpty({
+    message: '邮箱不能为空',
+  })
+  @IsEmail(
+    {},
+    {
+      message: '不是合法的邮箱格式',
+    },
+  )
   @Column('varchar', {
     name: 'email',
     nullable: true,
@@ -16,14 +24,17 @@ export class User extends BaseEntities {
   email: string | null;
 
   //电话号码
-  // @pa({ args: /^1\d{10}$/, msg: '电话号码格式不正确' })
   @Column('tinyint', {
     name: 'phone',
     width: 11,
     comment: '手机号',
+    nullable: true,
   })
-  phone: string;
+  phone?: string;
 
+  @IsNotEmpty({
+    message: '昵称不能为空',
+  })
   @Column('varchar', {
     name: 'nickname',
     nullable: true,
@@ -32,13 +43,19 @@ export class User extends BaseEntities {
   })
   nickname: string;
 
+  @IsNotEmpty({
+    message: '密码不能为空',
+  })
+  @MinLength(6, {
+    message: '密码不能少于 6 位',
+  })
   @Column('varchar', {
     name: 'password',
     comment: '密码',
     length: 255,
     select: false,
   })
-  password: string;
+  password?: string;
 
   @Column('varchar', {
     name: 'avatar',
@@ -57,38 +74,15 @@ export class User extends BaseEntities {
   info: string | null;
 
   @Column('tinyint', {
-    name: 'is_disable',
-    comment: '是否禁用',
-    width: 1,
+    comment: '是否是管理员',
     default: 0,
+    name: 'is_admin',
   })
-  isDisable: number;
+  isAdmin?: number;
 
-  @OneToMany(() => Logger, (logger) => logger.user_id)
-  loggers: Logger[];
-
-  //   @OneToMany(() => Comment, (comment) => comment.userinfo)
-  //   comments: Comment[];
-
-  //   @OneToMany(() => Message, (message) => message.user)
-  //   messages: Message[];
-
-  //   @OneToMany(() => Talk, (talk) => talk.userinfo)
-  //   talks: Talk[];
-
-  //   @OneToMany(() => TalkComment, (talkComment) => talkComment.userinfo)
-  //   talkComments: TalkComment[];
-
-  //   @OneToMany(() => Article, (article) => article.userinfo)
-  //   articles: Article[];
-
-  //   @ManyToOne(() => Role, (role) => role.userInfos, {
-  //     onDelete: 'RESTRICT',
-  //     onUpdate: 'CASCADE',
-  //   })
-  //   @JoinColumn([{ name: 'user_roleId', referencedColumnName: 'id' }])
-  //   userRole: Role;
-
-  //   menus: Menu[];
-  //   resources: Resource[];
+  @ManyToMany(() => Role)
+  @JoinTable({
+    name: 'user_roles',
+  })
+  roles?: Role[];
 }

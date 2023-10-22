@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsIP, IsNumber } from 'class-validator';
+import { IsIP } from 'class-validator';
 import { BaseEntities } from 'src/modules/base/entities/base.entity';
 import { User } from 'src/modules/user/entities/user.entity';
 import { Column, Entity, JoinColumn, ManyToOne, BeforeUpdate } from 'typeorm';
@@ -9,7 +9,7 @@ export class Logger extends BaseEntities {
   @Column({ type: 'text', name: 'content', comment: '日志内容' })
   content?: string;
 
-  // 前端路由
+  //  前端路由
   @Column({
     type: 'varchar',
     length: 100,
@@ -46,10 +46,6 @@ export class Logger extends BaseEntities {
   // 请求地址
   @Column({ type: 'varchar', length: 20, nullable: false, comment: '请求地址' })
   api_url: string;
-
-  @IsNumber()
-  @JoinColumn()
-  user_id: number;
 
   @JoinColumn({
     name: 'user_id',

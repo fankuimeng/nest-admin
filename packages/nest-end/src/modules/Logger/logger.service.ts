@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { RequestContext } from 'nestjs-request-context';
-import { Logger } from './entities/Logger.entity';
+import { Logger } from './entities/logger.entity';
 import { LogCallback, Logger as WinstonLogger, createLogger } from 'winston';
 import { ConfigService } from '@nestjs/config';
 import winstonConfig from 'src/config/winston.config';
@@ -60,7 +60,6 @@ export class LoggerService extends BaseService<Logger> {
       res: Request & { session: SessionModel };
     } = RequestContext.currentContext;
     const loggerFn = this.loggerFn[lever];
-    this.loggerFn.info;
     const newMessage =
       typeof message === 'function'
         ? message(context)
@@ -78,7 +77,7 @@ export class LoggerService extends BaseService<Logger> {
       RequestContext.currentContext.req;
     const { url, method, headers, ip, body } = request;
     const user_id = request?.session?.currentUserInfo?.id;
-    if (user_id) return;
+    if (!user_id) return;
     const logs: Partial<Logger> = {
       content: content + Math.random(),
       id: 1,
@@ -89,7 +88,7 @@ export class LoggerService extends BaseService<Logger> {
       api_url: url,
       params: body,
     };
-    await this.saveOne(logs);
+    return await this.repository.save(logs);
   }
 
   responseMessage = (...args) => {

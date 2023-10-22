@@ -1,4 +1,4 @@
-import { IsNumber, IsOptional } from 'class-validator';
+import { IsIn, IsNumber, IsOptional } from 'class-validator';
 import * as dayjs from 'dayjs';
 import { RequestContext } from 'nestjs-request-context';
 import {
@@ -9,6 +9,7 @@ import {
   VersionColumn,
 } from 'typeorm';
 import { Request } from 'express';
+
 export class BaseEntities {
   @PrimaryGeneratedColumn()
   @IsOptional()
@@ -34,7 +35,7 @@ export class BaseEntities {
   @Column({ name: 'create_by', update: false, nullable: true })
   createBy?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   name?: string;
 
   @Column({ name: 'update_by', nullable: true })
@@ -46,13 +47,21 @@ export class BaseEntities {
   @VersionColumn({ select: false, nullable: true })
   version?: number;
 
-  @Column({
+  @Column('tinyint', {
     name: 'is_delete',
     comment: '是否删除',
     nullable: true,
     default: 0,
   })
-  isDelete?: number;
+  isDelete: number;
+
+  @Column('tinyint', {
+    name: 'is_disable',
+    comment: '是否禁用',
+    width: 1,
+    default: 0,
+  })
+  isDisable: number;
 
   // 你可以在实体中定义具有任何名称的方法，并使用@BeforeUpdate标记它，并且 TypeORM 将在使用 repository/manager save更新现有实
   // 体之前调用它。 但请记住，只有在模型中更改信息时才会出现这种情况。

@@ -43,7 +43,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
         Method: ${request.method}
         IP: ${request.ip}
         Status code: ${status}
-        Response: ${exception} 
+        Response: ${JSON.stringify(exception)} 
         --------------------- 全局异常日志 ---------------------
         `;
     this.loggerService.logger(logFormat, 'error');

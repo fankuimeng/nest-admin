@@ -16,4 +16,10 @@ export class UserController extends BaseController<User> {
   constructor(private readonly userService: UserService) {
     super(userService);
   }
+
+  // 初始化数据
+  @Get('/init-data')
+  async initData() {
+    return await this.userService.initData();
+  }
 }

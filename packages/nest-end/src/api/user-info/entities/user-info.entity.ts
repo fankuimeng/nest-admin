@@ -17,7 +17,6 @@ import { Role } from 'src/api/role/entities/role.entity';
 import { Menu } from '../../menu/entities/menu.entity';
 import { Resource } from '../../resource/entities/resource.entity';
 
-@Entity('t_user_info', { schema: 'aurora' })
 export class UserInfo {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id', comment: '用户ID' })
   id: number;

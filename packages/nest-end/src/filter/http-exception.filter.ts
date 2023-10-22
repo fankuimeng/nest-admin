@@ -29,27 +29,24 @@ export class HttpExceptionFilter implements ExceptionFilter {
     // 如果 response.message 是个数组，就返回 join 的结果，否则还是返回 exception.message
     const res = exception.getResponse() as { message: string[] };
 
+    const newMessage = res?.message?.join
+      ? res?.message?.join?.()
+      : res?.message;
     const logFormat = `
         --------------------- HTTP 异常日志 ---------------------
         Request original url: ${request.originalUrl}
         Method: ${request.method}
         IP: ${request.ip}
         Status code: ${status}
-        Response: ${res.message}
+        Response: ${newMessage}
         --------------------- HTTP 异常日志 ---------------------
         `;
     this.loggerService.logger(logFormat, 'error');
 
     // 自定义异常返回体
-    response
+
+    return response
       .status(status)
-      .json(
-        this.loggerService.responseMessage(
-          null,
-          null,
-          res.message.join ? res.message.join?.() : res.message,
-          status,
-        ),
-      );
+      .json(this.loggerService.responseMessage(null, null, newMessage, status));
   }
 }
