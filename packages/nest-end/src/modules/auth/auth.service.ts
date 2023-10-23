@@ -8,11 +8,9 @@ import {
 import { UserService } from '../user/user.service';
 import { User } from '../user/entities/user.entity';
 import { md5, responseMessage } from 'src/utils';
-import { HttpError } from 'src/common/exception';
 import { RedisService } from '../redis/redis.service';
 import {
   AdminLoginResponseDto,
-  LoginDto,
   UserInfo,
   UserLoginDto,
   UserRegisterDto,
@@ -20,6 +18,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { ResponseModel } from 'src/typinng/global';
+import { BusinessException } from 'src/filter/business.exception';
 
 @Injectable()
 export class AuthService {
@@ -43,23 +42,30 @@ export class AuthService {
         name,
         isAdmin: type,
       },
-
+      select: { password: false },
       relations: ['roles', 'roles.permissions'],
     });
+
     if (!userinfo)
-      throw new HttpError('用户不存在，请注册', HttpStatus.UNAUTHORIZED);
+      throw new BusinessException(
+        '用户不存在，请注册',
+        HttpStatus.UNAUTHORIZED,
+      );
+
     if (md5(password) !== userinfo.password)
-      throw new HttpError('输入密码错误', HttpStatus.UNAUTHORIZED);
+      throw new BusinessException('输入密码错误', HttpStatus.UNAUTHORIZED);
+
     const redisCaptcha = await this.redisService.getValue(
       `captcha_${userinfo.email}`,
     );
-    if (!redisCaptcha)
-      throw new HttpError('验证码已失效', HttpStatus.UNAUTHORIZED);
-    if (redisCaptcha === captcha)
-      throw new HttpError('验证码不正确', HttpStatus.UNAUTHORIZED);
+    if (!userinfo.isAdmin && !redisCaptcha)
+      throw new BusinessException('验证码已失效', HttpStatus.UNAUTHORIZED);
 
-    if (userinfo.isDisable)
-      throw new HttpError(
+    if (!userinfo.isAdmin && redisCaptcha !== captcha)
+      throw new BusinessException('验证码不正确', HttpStatus.UNAUTHORIZED);
+
+    if (userinfo?.isDisable)
+      throw new BusinessException(
         '当前用户已被禁用,请联系管理员',
         HttpStatus.UNAUTHORIZED,
       );
@@ -68,14 +74,16 @@ export class AuthService {
   async register(user: UserRegisterDto) {
     const captcha = await this.redisService.getValue(`captcha_${user.email}`);
 
-    if (!captcha) throw new HttpError('验证码已失效', HttpStatus.BAD_REQUEST);
+    if (!captcha)
+      throw new BusinessException('验证码已失效', HttpStatus.BAD_REQUEST);
 
     if (user.captcha !== captcha)
-      throw new HttpError('验证码不正确', HttpStatus.BAD_REQUEST);
+      throw new BusinessException('验证码不正确', HttpStatus.BAD_REQUEST);
     const foundUser = await this.userService.repository.findOneBy({
       name: user.name,
     });
-    if (foundUser) throw new HttpError('用户已存在', HttpStatus.BAD_REQUEST);
+    if (foundUser)
+      throw new BusinessException('用户已存在', HttpStatus.BAD_REQUEST);
     return await this.userService.saveOne(
       { ...user, password: md5(user.password) },
       {
@@ -90,49 +98,54 @@ export class AuthService {
     msg = '登录成功',
     type = 0,
   ): Promise<ResponseModel<AdminLoginResponseDto>> {
-    const newUser: UserInfo = {
-      ...userInfo,
-      password: null,
-      roles: userInfo.roles.map((item) => item.name),
-      permissions: userInfo.roles.reduce((arr, item) => {
-        item.permissions.forEach((permission) => {
-          if (arr.indexOf(permission) === -1) {
-            arr.push(permission);
-          }
-        });
-        return arr;
-      }, []),
-    };
+    try {
+      const newUser: UserInfo = {
+        ...userInfo,
+        password: null,
+        roles: userInfo.roles.map((item) => item.name),
+        permissions: userInfo.roles.reduce((arr, item) => {
+          item.permissions.forEach((permission) => {
+            if (arr.indexOf(permission) === -1) {
+              arr.push(permission);
+            }
+          });
+          return arr;
+        }, []),
+      };
 
-    const accessToken = this.jwtService.sign(
-      {
-        userId: newUser.id,
-        username: newUser.name,
-        roles: newUser.roles,
-        permissions: newUser.permissions,
-      },
-      {
-        expiresIn:
-          this.configService.get('JWT_ACCESS_TOKEN_EXPIRES_TIME') || '30m',
-      },
-    );
-
-    const refreshToken = this.jwtService.sign(
-      {
-        userId: newUser.id,
-      },
-      {
-        expiresIn:
-          this.configService.get('JWT_REFRESH_TOKEN_EXPIRES_TIME') || '7d',
-      },
-    );
-    return responseMessage(
-      { data: newUser, refreshToken, accessToken },
-      null,
-      msg,
-    );
+      const accessToken = this.jwtService.sign(
+        {
+          userId: newUser.id,
+          username: newUser.name,
+          roles: newUser.roles,
+          permissions: newUser.permissions,
+        },
+        {
+          expiresIn:
+            this.configService.get('JWT_ACCESS_TOKEN_EXPIRES_TIME') || '30m',
+        },
+      );
+      const refreshToken = this.jwtService.sign(
+        {
+          userId: newUser.id,
+        },
+        {
+          expiresIn:
+            this.configService.get('JWT_REFRESH_TOKEN_EXPIRES_TIME') || '7d',
+        },
+      );
+      console.log(
+        responseMessage(
+          { data: newUser, refreshToken, accessToken },
+          null,
+          msg,
+        ),
+      );
+      return responseMessage({ ...newUser }, null, msg, 200);
+    } catch (error) {
+      throw new BusinessException(error.message, 500);
+    }
   }
-
   async refresh(refreshToken: string) {
     try {
       const data = this.jwtService.verify(refreshToken);

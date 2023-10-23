@@ -97,7 +97,7 @@ export class AuthController {
   @ApiOperation({ summary: '获取登录后的用户权限信息' })
   @Post('login')
   async signin(@Body() userInfo: UserLoginDto) {
-    return await this.authService.login(userInfo);
+    return this.authService.login(userInfo);
   }
 
   @Get('refresh')

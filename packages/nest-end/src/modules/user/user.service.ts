@@ -11,7 +11,6 @@ import { User } from './entities/user.entity';
 import { BaseService } from '../base/base.service';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { RedisService } from '../redis/redis.service';
-import { HttpError } from 'src/common/exception';
 import { md5, responseMessage } from 'src/utils';
 import { Role } from './entities/role.entity';
 import { Permission } from './entities/rermission.entity';
@@ -77,7 +76,6 @@ export class UserService extends BaseService<User> {
     await this.permissionRepository.save([permission1, permission2]);
     await this.roleRepository.save([role1, role2]);
     await this.repository.save([user1, user2]);
-
     return responseMessage(null);
   }
 }

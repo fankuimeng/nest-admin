@@ -82,20 +82,21 @@ export class LoggerService extends BaseService<Logger> {
       content: content + Math.random(),
       id: 1,
       ip,
-      path: request.headers.referer,
-      user_agent: headers['user-agent'],
-      method,
-      api_url: url,
-      params: body,
-    };
-    return await this.repository.save(logs);
-  }
+        path: request.headers.referer,
+        user_agent: headers['user-agent'],
+        method,
+        api_url: url,
+        params: body,
+      };
+      return await this.repository.save(logs);
+    }
 
   responseMessage = (...args) => {
     if (args[1]) {
-      this.saveLogs(args[1]);
+      const content = args[1]?.content || args[1];
+      const type = args[1]?.type || 'info';
+      this.logger(content, type, { save: true });
       args[1] = null;
-      this.logger(args);
     }
     return responseMessage(...args);
   };

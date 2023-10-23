@@ -1,6 +1,12 @@
 import { type } from 'os';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, isEmail } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsNumber,
+  isEmail,
+  isNumber,
+} from 'class-validator';
 import { ResponseDto } from 'src/dto/response.dto';
 import { User } from 'src/modules/user/entities/user.entity';
 
@@ -38,6 +44,9 @@ export class LoginDto {
   })
   password: string;
 
+  @IsNumber({
+    allowNaN: true,
+  })
   type?: number;
 }
 

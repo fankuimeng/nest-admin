@@ -24,8 +24,3 @@ export class resourcePermission extends HttpException {
   }
 }
 
-export class HttpError extends HttpException {
-  constructor(message: string, status) {
-    super({ message }, status);
-  }
-}

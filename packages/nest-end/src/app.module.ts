@@ -13,10 +13,7 @@ import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { AllExceptionsFilter } from './filter/any-exception.filter';
 import { HttpReqTransformInterceptor } from './interceptors/http-req.interceptor';
 import { ResponseModel } from './typinng/global';
-import { HttpExceptionFilter } from './filter/http-exception.filter';
 import { RequestContextModule } from 'nestjs-request-context';
-import { WinstonModule } from 'nest-winston';
-import winstonConfig from './config/winston.config';
 import { LoggerService } from './modules/Logger/logger.service';
 import { TransformInterceptor } from './interceptors/transform.interceptor';
 import { JwtModule } from '@nestjs/jwt';
@@ -47,12 +44,6 @@ import { JwtModule } from '@nestjs/jwt';
       provide: APP_FILTER,
       useClass: AllExceptionsFilter,
     },
-    {
-      // 这样注册也是全局的
-      provide: APP_FILTER,
-      useClass: HttpExceptionFilter,
-    },
-
     {
       provide: APP_INTERCEPTOR,
       useClass: HttpReqTransformInterceptor<ResponseModel>, // 全局拦截器，用来收集日志

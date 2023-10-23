@@ -33,7 +33,7 @@ export class User extends BaseEntities {
   phone?: string;
 
   @IsNotEmpty({
-    message: '昵称不能为空',
+    message: '用户昵称不能为空',
   })
   @Column('varchar', {
     name: 'nickname',
@@ -53,7 +53,6 @@ export class User extends BaseEntities {
     name: 'password',
     comment: '密码',
     length: 255,
-    select: false,
   })
   password?: string;
 

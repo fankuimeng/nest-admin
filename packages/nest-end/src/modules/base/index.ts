@@ -1,5 +1,4 @@
-import { HttpException } from '@nestjs/common';
-import { HttpError } from 'src/common/exception';
+import { BusinessException } from 'src/filter/business.exception';
 import { responseMessage } from 'src/utils';
 import { EntityManager, EntityTarget, Repository } from 'typeorm';
 
@@ -49,7 +48,7 @@ export const getRepositoryTransaction = async <T>(
         code: options?.errorCode || -1,
       };
       await queryRunner.rollbackTransaction();
-      throw new HttpError(
+      throw new BusinessException(
         errorCallbackResult.msg || error.message,
         errorCallbackResult?.code,
       );

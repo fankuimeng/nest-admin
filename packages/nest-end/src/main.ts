@@ -6,13 +6,13 @@ import * as session from 'express-session';
 import { HttpException, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as express from 'express';
-import { HttpExceptionFilter } from './filter/http-exception.filter';
 import { TransformInterceptor } from './interceptors/transform.interceptor';
 import { join } from 'path';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { HttpArgumentsHost } from '@nestjs/common/interfaces';
 import { TimeoutInterceptor } from './interceptors/timeout.interceptor';
 import { LoggerService } from './modules/Logger/logger.service';
+import { AllExceptionsFilter } from './filter/any-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -60,7 +60,7 @@ async function bootstrap() {
       windowMs: 60 * 1000, //1分钟
       max: 100, //允许每个ip在这windows时间里请求的次数
       handler: (req, res, next) => {
-        const httpFilter = new HttpExceptionFilter();
+        const httpFilter = new AllExceptionsFilter();
         httpFilter.catch(new HttpException('当前请求过多，请稍后重试', 429), {
           switchToHttp: function (): HttpArgumentsHost {
             const httpArgumentsHost = {
