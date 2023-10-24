@@ -32,6 +32,14 @@ export class User extends BaseEntities {
   })
   phone?: string;
 
+  //电话号码
+  @Column('int', {
+    name: 'login_num',
+    comment: '手机号',
+    default: 0,
+  })
+  loginNum?: number;
+
   @IsNotEmpty({
     message: '用户昵称不能为空',
   })
@@ -63,6 +71,19 @@ export class User extends BaseEntities {
     length: 1024,
   })
   avatar: string;
+
+  @Column('varchar', {
+    name: 'login_last_ip',
+    nullable: true,
+  })
+  loginLastIp: string;
+
+  @Column('date', {
+    name: 'login_last_time',
+    nullable: true,
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  loginLastTime: Date;
 
   @Column('varchar', {
     name: 'info',

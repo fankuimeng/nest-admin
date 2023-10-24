@@ -3,12 +3,14 @@ import {
   Injectable,
   PipeTransform,
   BadRequestException,
+  ValidationPipeOptions,
 } from '@nestjs/common';
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class ValidationPipe implements PipeTransform {
+  constructor(options?: ValidationPipeOptions) {}
   async transform(value: any, { metatype }: ArgumentMetadata) {
     if (!metatype || !this.toValidate(metatype)) {
       // 如果没有传入验证规则，则不验证，直接返回数据

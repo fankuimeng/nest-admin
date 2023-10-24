@@ -11,14 +11,16 @@ import { md5, responseMessage } from 'src/utils';
 import { RedisService } from '../redis/redis.service';
 import {
   AdminLoginResponseDto,
+  AdminLoginUserVo,
   UserInfo,
   UserLoginDto,
   UserRegisterDto,
 } from './typing/user';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { ResponseModel } from 'src/typinng/global';
+import { ResponseModel, SessionModel } from 'src/typinng/global';
 import { BusinessException } from 'src/filter/business.exception';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class AuthService {
@@ -35,42 +37,36 @@ export class AuthService {
   @Inject(RedisService)
   private redisService: RedisService;
 
-  async login(userInfo: UserLoginDto) {
-    const { name, password, captcha, type = 1 } = userInfo;
-    const userinfo = await this.userService.findOne({
-      where: {
-        name,
-        isAdmin: type,
-      },
-      select: { password: false },
-      relations: ['roles', 'roles.permissions'],
+  async login(userInfo: UserLoginDto, ip, session: SessionModel) {
+    const user = await this.validateUser(userInfo);
+    const { accessToken, refreshToken } = await this.generateTokens(user);
+    // 执行更新操作 // 将登录次数+1
+    const newUser = await this.userService.saveOne({
+      loginLastIp: ip,
+      loginLastTime: new Date(),
+      id: user.id,
+      loginNum: user.loginNum + 1,
     });
+    // 将数据保存到session
+    session.currentUserInfo = newUser as User;
 
-    if (!userinfo)
-      throw new BusinessException(
-        '用户不存在，请注册',
-        HttpStatus.UNAUTHORIZED,
-      );
-
-    if (md5(password) !== userinfo.password)
-      throw new BusinessException('输入密码错误', HttpStatus.UNAUTHORIZED);
-
-    const redisCaptcha = await this.redisService.getValue(
-      `captcha_${userinfo.email}`,
+    // 将用户 token 保存到 redis
+    await this.redisService.setValue(
+      `${user.id}-${user.name}`,
+      accessToken,
+      Number(this.configService.get('JWT_ACCESS_TOKEN_EXPIRES_TIME')),
     );
-    if (!userinfo.isAdmin && !redisCaptcha)
-      throw new BusinessException('验证码已失效', HttpStatus.UNAUTHORIZED);
-
-    if (!userinfo.isAdmin && redisCaptcha !== captcha)
-      throw new BusinessException('验证码不正确', HttpStatus.UNAUTHORIZED);
-
-    if (userinfo?.isDisable)
-      throw new BusinessException(
-        '当前用户已被禁用,请联系管理员',
-        HttpStatus.UNAUTHORIZED,
-      );
-    return this.handlUserLogin(userinfo);
+    await this.redisService.setValue(
+      `refreshToken-${user.id}`,
+      refreshToken,
+      Number(this.configService.get('JWT_ACCESS_TOKEN_EXPIRES_TIME')),
+    );
+    return responseMessage(
+      { userInfo: newUser, accessToken, refreshToken },
+      '登录成功',
+    );
   }
+
   async register(user: UserRegisterDto) {
     const captcha = await this.redisService.getValue(`captcha_${user.email}`);
 
@@ -92,67 +88,70 @@ export class AuthService {
       },
     );
   }
+  async validateUser(userInfo: UserLoginDto) {
+    const { name, password, captcha, type = 1 } = userInfo;
+    const userinfo = await this.userService.findOne({
+      where: {
+        name,
+        isAdmin: type,
+      },
+      select: { password: false },
+      relations: ['roles', 'roles.permissions'],
+    });
+    if (!userinfo)
+      throw new BusinessException(
+        '用户不存在，请注册',
+        HttpStatus.UNAUTHORIZED,
+      );
+    if (md5(password) !== userinfo.password)
+      throw new BusinessException('输入密码错误', HttpStatus.UNAUTHORIZED);
 
-  async handlUserLogin(
-    userInfo: User,
-    msg = '登录成功',
-    type = 0,
-  ): Promise<ResponseModel<AdminLoginResponseDto>> {
-    try {
-      const newUser: UserInfo = {
-        ...userInfo,
-        password: null,
-        roles: userInfo.roles.map((item) => item.name),
-        permissions: userInfo.roles.reduce((arr, item) => {
-          item.permissions.forEach((permission) => {
-            if (arr.indexOf(permission) === -1) {
-              arr.push(permission);
-            }
-          });
-          return arr;
-        }, []),
-      };
+    const redisCaptcha = await this.redisService.getValue(
+      `captcha_${userinfo.email}`,
+    );
+    if (!userinfo.isAdmin && !redisCaptcha)
+      throw new BusinessException('验证码已失效', HttpStatus.UNAUTHORIZED);
 
-      const accessToken = this.jwtService.sign(
-        {
-          userId: newUser.id,
-          username: newUser.name,
-          roles: newUser.roles,
-          permissions: newUser.permissions,
-        },
-        {
-          expiresIn:
-            this.configService.get('JWT_ACCESS_TOKEN_EXPIRES_TIME') || '30m',
-        },
+    if (!userinfo.isAdmin && redisCaptcha !== captcha)
+      throw new BusinessException('验证码不正确', HttpStatus.UNAUTHORIZED);
+    if (userinfo?.isDisable)
+      throw new BusinessException(
+        '当前用户已被禁用,请联系管理员',
+        HttpStatus.UNAUTHORIZED,
       );
-      const refreshToken = this.jwtService.sign(
-        {
-          userId: newUser.id,
-        },
-        {
-          expiresIn:
-            this.configService.get('JWT_REFRESH_TOKEN_EXPIRES_TIME') || '7d',
-        },
-      );
-      console.log(
-        responseMessage(
-          { data: newUser, refreshToken, accessToken },
-          null,
-          msg,
-        ),
-      );
-      return responseMessage({ ...newUser }, null, msg, 200);
-    } catch (error) {
-      throw new BusinessException(error.message, 500);
-    }
+    return userinfo;
   }
-  async refresh(refreshToken: string) {
+  // login -> token
+  async generateTokens(userInfo: User): Promise<Partial<AdminLoginUserVo>> {
+    const accessToken = this.jwtService.sign(
+      {
+        userId: userInfo.id,
+        username: userInfo.name,
+      },
+      {
+        secret: this.configService.get('JWT_SECRET'),
+      },
+    );
+    const refreshToken = this.jwtService.sign(
+      {
+        userId: userInfo.id,
+      },
+      {
+        secret: this.configService.get('JWT_SECRET'),
+      },
+    );
+
+    return { refreshToken, userInfo, accessToken };
+  }
+
+  async refresh(refreshTokenArgs: string) {
     try {
-      const data = this.jwtService.verify(refreshToken);
-      const user = await this.userService.repository.findOneBy({
+      const data = this.jwtService.verify(refreshTokenArgs);
+      const userInfo = await this.userService.repository.findOneBy({
         id: Number(data.userId),
       });
-      return this.handlUserLogin(user, '刷新成功');
+      const { refreshToken, accessToken } = await this.generateTokens(userInfo);
+      return responseMessage({ refreshToken, accessToken, userInfo });
     } catch (e) {
       throw new UnauthorizedException('token 已失效，请重新登录');
     }

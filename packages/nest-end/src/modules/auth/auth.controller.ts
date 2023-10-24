@@ -22,16 +22,16 @@ import {
 import { responseMessage } from 'src/utils';
 import * as svgCaptcha from 'svg-captcha';
 import { RedisService } from '../redis/redis.service';
-import { User } from '../user/entities/user.entity';
 import { EmailService } from '../common/email.service';
 import {
   AdminLoginResponseDto,
-  LoginDto,
   UserLoginDto,
   UserRegisterDto,
   VerifyCodeResponseDto,
 } from './typing/user';
 import { ResponseDto } from 'src/dto/response.dto';
+import { SessionModel } from 'src/typinng/global';
+import { IpAddress } from 'src/utils/requestIp';
 
 @ApiTags('用户登录模块')
 @ApiHeader({
@@ -96,8 +96,12 @@ export class AuthController {
   @ApiOkResponse({ type: AdminLoginResponseDto })
   @ApiOperation({ summary: '获取登录后的用户权限信息' })
   @Post('login')
-  async signin(@Body() userInfo: UserLoginDto) {
-    return this.authService.login(userInfo);
+  async signin(
+    @Body() userInfo: UserLoginDto,
+    @IpAddress() ip: string,
+    @Session() session: SessionModel,
+  ) {
+    return this.authService.login(userInfo, ip, session);
   }
 
   @Get('refresh')

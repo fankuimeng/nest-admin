@@ -87,7 +87,7 @@ export class AdminLoginUserVo {
     description: '用户信息',
     default: {},
   })
-  userInfo: UserInfo;
+  userInfo: User;
 
   @ApiProperty({
     type: String,

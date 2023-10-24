@@ -1,10 +1,4 @@
-import {
-  Body,
-  HttpException,
-  HttpStatus,
-  Inject,
-  Injectable,
-} from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { PageQueryType } from 'src/typinng/global';
 import { EntityManager, Repository, SelectQueryBuilder } from 'typeorm';
 import { User } from './entities/user.entity';

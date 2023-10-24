@@ -18,7 +18,7 @@ export interface ApiError {
 }
 
 // @Catch() 装饰器绑定所需的元数据到异常过滤器上。它告诉 Nest这个特定的过滤器正在寻找
-@Catch(BusinessException)
+@Catch(Error)
 export class AllExceptionsFilter implements ExceptionFilter {
   @Inject(LoggerService)
   private loggerService: LoggerService;
@@ -69,7 +69,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
         Method: ${request.method}
         IP: ${request.ip}
         Status code: ${status}
-        Response: ${body} 
+        Response: ${typeof body === 'string' ? body : JSON.stringify(body)} 
         --------------------- 异常日志 ---------------------
         `;
     // 自定义异常返回体logFormat

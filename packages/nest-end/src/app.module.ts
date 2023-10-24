@@ -44,14 +44,14 @@ import { JwtModule } from '@nestjs/jwt';
       provide: APP_FILTER,
       useClass: AllExceptionsFilter,
     },
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: HttpReqTransformInterceptor<ResponseModel>, // 全局拦截器，用来收集日志
-    },
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: TransformInterceptor,
-    },
+    // {
+    //   provide: APP_INTERCEPTOR,
+    //   useClass: HttpReqTransformInterceptor<ResponseModel>, // 全局拦截器，用来收集日志
+    // },
+    // {
+    //   provide: APP_INTERCEPTOR,
+    //   useClass: TransformInterceptor,
+    // },
   ],
 })
 export class AppModule implements NestModule {

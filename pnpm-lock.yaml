@@ -271,6 +271,7 @@ importers:
       passport: ^0.6.0
       passport-jwt: ^4.0.1
       reflect-metadata: ^0.1.13
+      request-ip: ^3.3.0
       rxjs: ^7.8.1
       socket.io: ^4.7.2
       source-map-support: ^0.5.21
@@ -311,6 +312,7 @@ importers:
       nodemailer: registry.npmmirror.com/nodemailer/6.9.6
       passport-jwt: 4.0.1
       reflect-metadata: 0.1.13
+      request-ip: registry.npmmirror.com/request-ip/3.3.0
       rxjs: 7.8.1
       socket.io: 4.7.2
       stacktrace-js: 2.0.2
@@ -27073,6 +27075,12 @@ packages:
     requiresBuild: true
     dev: false
     optional: true
+
+  registry.npmmirror.com/request-ip/3.3.0:
+    resolution: {integrity: sha512-cA6Xh6e0fDBBBwH77SLJaJPBmD3nWVAcF9/XAcsrIHdjhFzFiB5aNQFytdjCGPezU3ROwrR11IddKAM08vohxA==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/request-ip/-/request-ip-3.3.0.tgz}
+    name: request-ip
+    version: 3.3.0
+    dev: false
 
   registry.npmmirror.com/typeorm-naming-strategies/4.1.0_typeorm@0.3.17:
     resolution: {integrity: sha512-vPekJXzZOTZrdDvTl1YoM+w+sUIfQHG4kZTpbFYoTsufyv9NIBRe4Q+PdzhEAFA2std3D9LZHEb1EjE9zhRpiQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/typeorm-naming-strategies/-/typeorm-naming-strategies-4.1.0.tgz}

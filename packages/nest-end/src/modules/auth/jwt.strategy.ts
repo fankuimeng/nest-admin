@@ -20,7 +20,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       // 这意味着，如果我们的路由提供了一个过期的 JWT ，请求将被拒绝，并发送 401 未经授权的响应。Passport 会自动为我们办理
       ignoreExpiration: false,
       // 使用权宜的选项来提供对称的秘密来签署令牌
-      secretOrKey: configService.get('JWT_ACCESS_TOKEN_EXPIRES_TIME'),
+      secretOrKey: configService.get('JWT_SECRET'),
       passReqToCallback: true,
     });
   }
