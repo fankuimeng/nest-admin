@@ -78,10 +78,10 @@ export class User extends BaseEntities {
   })
   loginLastIp: string;
 
-  @Column('date', {
-    name: 'login_last_time',
+  @Column({
+    type: 'date',
     nullable: true,
-    default: () => 'CURRENT_TIMESTAMP',
+    name: 'login_last_time',
   })
   loginLastTime: Date;
 
