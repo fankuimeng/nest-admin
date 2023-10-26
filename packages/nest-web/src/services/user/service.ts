@@ -13,3 +13,15 @@ export async function login(
     ...(options || {}),
   });
 }
+
+/** 用刷新token 换取权限token */
+export async function getRefreshToken(
+  refreshToken: string,
+  options?: { [key: string]: any },
+) {
+  return request<Res<LoginResultType>>("/auth/refresh", {
+    params: { refreshToken },
+    method: "POST",
+    ...(options || {}),
+  });
+}

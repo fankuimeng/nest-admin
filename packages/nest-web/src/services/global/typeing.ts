@@ -1,5 +1,9 @@
 // @ts-ignore
 /* eslint-disable */
+
+import type { Settings as LayoutSettings } from "@ant-design/pro-components";
+import { USERMANAGEMENT } from "../user/typeing";
+
 type CurrentUser = {
   name?: string;
   avatar?: string;
@@ -24,6 +28,20 @@ type CurrentUser = {
 type PageParams = {
   current?: number;
   pageSize?: number;
+};
+export type InitialStateTypes = {
+  Locales?: Record<string, any>;
+  Access_token?: string;
+  Settings?: Partial<LayoutSettings>;
+  CurrentUser?: USERMANAGEMENT;
+  Permissions?: string[];
+  // RouteMenu?: MENUMANAGEMENT[];
+  Collapsed?: boolean;
+};
+
+export type TableTimes = {
+  created_time: string; // 创建时间
+  updated_time: string; // 最后一次更新时间
 };
 
 type RuleListItem = {
@@ -102,6 +120,7 @@ export enum REQUEST_CODE {
 export enum LOCAL_STORAGE {
   USER_INFO = "USER_INFO", // 用户信息
   ACCESS_TOKEN = "ACCESS_TOKEN", // ACCESS_TOKEN
+  REFRESH_TOKEN = "REFRESH_TOKEN", // refreshToken
   LAYOUT = "LAYOUT", // 布局
   LOCK_SLEEP = "LOCK_SLEEP", // 睡眠
 }

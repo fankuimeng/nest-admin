@@ -18,10 +18,6 @@ import { LoggerService } from './modules/Logger/logger.service';
 import { TransformInterceptor } from './interceptors/transform.interceptor';
 import { JwtModule } from '@nestjs/jwt';
 
-// import { WinstonModule } from 'nest-winston';
-// import * as winston from 'winston';
-// import 'winston-daily-rotate-file';
-
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -44,10 +40,10 @@ import { JwtModule } from '@nestjs/jwt';
       provide: APP_FILTER,
       useClass: AllExceptionsFilter,
     },
-    // {
-    //   provide: APP_INTERCEPTOR,
-    //   useClass: HttpReqTransformInterceptor<ResponseModel>, // 全局拦截器，用来收集日志
-    // },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: HttpReqTransformInterceptor<ResponseModel>, // 全局拦截器，用来收集日志
+    },
     // {
     //   provide: APP_INTERCEPTOR,
     //   useClass: TransformInterceptor,

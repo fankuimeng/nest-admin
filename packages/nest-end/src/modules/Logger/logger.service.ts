@@ -79,17 +79,16 @@ export class LoggerService extends BaseService<Logger> {
     const user_id = request?.session?.currentUserInfo?.id;
     if (!user_id) return;
     const logs: Partial<Logger> = {
-      content: content + Math.random(),
-      id: 1,
+      content: content,
       ip,
-        path: request.headers.referer,
-        user_agent: headers['user-agent'],
-        method,
-        api_url: url,
-        params: body,
-      };
-      return await this.repository.save(logs);
-    }
+      path: request.headers.referer,
+      user_agent: headers['user-agent'],
+      method,
+      api_url: url,
+      params: body,
+    };
+    return await this.repository.save(logs);
+  }
 
   responseMessage = (...args) => {
     if (args[1]) {

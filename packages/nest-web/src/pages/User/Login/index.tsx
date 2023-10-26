@@ -1,4 +1,4 @@
-import { Footer } from '@/components';
+import { Footer } from "@/components";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import {
   LoginForm,
@@ -11,14 +11,20 @@ import {
   useIntl,
   useModel,
   useRequest,
+  history,
 } from "@umijs/max";
 import { Col, message, Row } from "antd";
 import React from "react";
 import { flushSync } from "react-dom";
 import styles from "./index.module.less"; // css 样式恩建
 import { login } from "@/services/user/service";
-import { LoginParams } from "@/services/user/typeing";
-
+import {
+  LoginParams,
+  LoginResultType,
+  USERMANAGEMENT,
+} from "@/services/user/typeing";
+import { LOCAL_STORAGE } from "@/services/global/typeing";
+import LocalStorage from "@/utils/storage";
 const Login: React.FC = () => {
   const { initialState, setInitialState } = useModel("@@initialState");
 
@@ -38,6 +44,29 @@ const Login: React.FC = () => {
 
   const { run: runLogin, loading: loginLoading } = useRequest(login, {
     manual: true,
+    onSuccess: async (data, params) => {
+      console.log("🚀 ~ file: index.tsx:43 ~ data:", data);
+      const { accessToken, refreshToken } = data || {};
+      LocalStorage.setLocalStorageItem(LOCAL_STORAGE.ACCESS_TOKEN, accessToken);
+      LocalStorage.setLocalStorageItem(
+        LOCAL_STORAGE.REFRESH_TOKEN,
+        refreshToken,
+      );
+
+      const defaultLoginSuccessMessage = intl.formatMessage({
+        id: "pages.login.success",
+        defaultMessage: "登录成功！",
+      });
+      // await setInitialState((s: any) => ({
+      //   ...s,
+      //   currentUser: data?.userInfo as USERMANAGEMENT,
+      // })); // 路由跳转
+      message.success(defaultLoginSuccessMessage);
+      await fetchUserInfo();
+      const urlParams = new URL(window.location.href).searchParams;
+      history.push(urlParams.get("redirect") || "/");
+      return;
+    },
   });
 
   /**

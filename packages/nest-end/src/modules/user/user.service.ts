@@ -1,5 +1,5 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { PageQueryType } from 'src/typinng/global';
+import { Get, Inject, Injectable } from '@nestjs/common';
+import { PageQueryType, SessionModel } from 'src/typinng/global';
 import { EntityManager, Repository, SelectQueryBuilder } from 'typeorm';
 import { User } from './entities/user.entity';
 import { BaseService } from '../base/base.service';
@@ -71,5 +71,9 @@ export class UserService extends BaseService<User> {
     await this.roleRepository.save([role1, role2]);
     await this.repository.save([user1, user2]);
     return responseMessage(null);
+  }
+
+  async currentUser(session: SessionModel) {
+    return responseMessage(session.currentUserInfo);
   }
 }

@@ -13,11 +13,20 @@ export class RedisService {
     });
   }
 
-  setValue(key: string, value: string, time: number = 2) {
-    const stime = 60 * 60 * 24 * Math.floor(time);
-    return this.redisClient.setex(key, value, stime);
+  async setValue(key: string, value: string, time: number = 2) {
+    value = JSON.stringify(value);
+    const newTime = time * 60 * 60 * 24;
+    if (!newTime) {
+      await this.redisClient.set(key, value);
+    } else {
+      await this.redisClient.set(key, value, 'EX', newTime);
+    }
   }
 
+  /**
+   * @description: 获取 redis 缓存
+   * @param {string} key
+   */
   getValue(key: string) {
     return this.redisClient.get(key);
   }
@@ -31,6 +40,10 @@ export class RedisService {
     return keys;
   }
 
+  /**
+   * @description: 删除 redis 缓存
+   * @param {string} key
+   */
   delValue(key: string) {
     return this.redisClient.del(key);
   }
@@ -45,5 +58,12 @@ export class RedisService {
 
   getAllHashFields(key: string) {
     return this.redisClient.hgetall(key);
+  }
+
+  /**
+   * @description: 清空 redis 缓存
+   */
+  async cacheFlushall(): Promise<void> {
+    await this.redisClient.flushall();
   }
 }

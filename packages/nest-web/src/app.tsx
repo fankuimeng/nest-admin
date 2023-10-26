@@ -1,13 +1,20 @@
-import { Footer, Question, SelectLang, AvatarDropdown, AvatarName } from '@/components';
-import { LinkOutlined } from '@ant-design/icons';
-import type { Settings as LayoutSettings } from '@ant-design/pro-components';
-import { SettingDrawer } from '@ant-design/pro-components';
-import type { RunTimeLayoutConfig } from '@umijs/max';
-import { history, Link } from '@umijs/max';
+import {
+  Footer,
+  Question,
+  SelectLang,
+  AvatarDropdown,
+  AvatarName,
+} from "@/components";
+import { LinkOutlined } from "@ant-design/icons";
+import type { Settings as LayoutSettings } from "@ant-design/pro-components";
+import { SettingDrawer } from "@ant-design/pro-components";
+import type { RunTimeLayoutConfig } from "@umijs/max";
+import { history, Link } from "@umijs/max";
 import defaultSettings from "../config/defaultSettings";
 import { currentUser as queryCurrentUser } from "@/services/ant-design-pro/api";
 import React from "react";
 import requestConfig from "./utils/requestConfig";
+import { USERMANAGEMENT } from "./services/user/typeing";
 const isDev = process.env.NODE_ENV === "development";
 const loginPath = "/user/login";
 
@@ -16,9 +23,9 @@ const loginPath = "/user/login";
  * */
 export async function getInitialState(): Promise<{
   settings?: Partial<LayoutSettings>;
-  currentUser?: API.CurrentUser;
+  currentUser?: USERMANAGEMENT;
   loading?: boolean;
-  fetchUserInfo?: () => Promise<API.CurrentUser | undefined>;
+  fetchUserInfo?: () => Promise<USERMANAGEMENT | undefined>;
 }> {
   const fetchUserInfo = async () => {
     try {
@@ -46,12 +53,12 @@ export async function getInitialState(): Promise<{
     settings: defaultSettings as Partial<LayoutSettings>,
   };
 }
-
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
 export const layout: RunTimeLayoutConfig = ({
   initialState,
   setInitialState,
 }) => {
+  console.log("🚀 ~ file: app.tsx:61 ~ initialState:", initialState);
   return {
     actionsRender: () => [
       <Question key="doc" />,

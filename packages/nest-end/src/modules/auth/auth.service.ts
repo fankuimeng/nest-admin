@@ -20,7 +20,6 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { ResponseModel, SessionModel } from 'src/typinng/global';
 import { BusinessException } from 'src/filter/business.exception';
-import * as dayjs from 'dayjs';
 
 @Injectable()
 export class AuthService {
@@ -52,8 +51,6 @@ export class AuthService {
     session.currentUserInfo = newUser as User;
 
     // 将用户 token 保存到 redis
-    console.log(this.configService.get('JWT_ACCESS_TOKEN_EXPIRES_TIME'));
-    
     await this.redisService.setValue(
       `${user.id}-${user.name}`,
       accessToken,
@@ -65,7 +62,8 @@ export class AuthService {
       Number(this.configService.get('JWT_REFRESH_TOKEN_EXPIRES_TIME')),
     );
     return responseMessage(
-      { userInfo: newUser, accessToken, refreshToken },
+      { userInfo: { ...newUser, password: null }, accessToken, refreshToken },
+      '登录成功',
       '登录成功',
     );
   }
@@ -146,16 +144,24 @@ export class AuthService {
     return { refreshToken, userInfo, accessToken };
   }
 
-  async refresh(refreshTokenArgs: string) {
-    try {
-      const data = this.jwtService.verify(refreshTokenArgs);
-      const userInfo = await this.userService.repository.findOneBy({
-        id: Number(data.userId),
-      });
-      const { refreshToken, accessToken } = await this.generateTokens(userInfo);
-      return responseMessage({ refreshToken, accessToken, userInfo });
-    } catch (e) {
-      throw new UnauthorizedException('token 已失效，请重新登录');
+  async refresh(refreshTokenArgs: string, session: SessionModel) {
+    // 获取 redis 存储的 token
+    const cacheToken = await this.redisService.getValue(
+      `refreshToken-${session.currentUserInfo.id}`,
+    );
+    // token 已过期
+    if (!cacheToken) {
+      throw new UnauthorizedException('刷新token令牌已过期，请重新登录！');
     }
+    // token 校验
+    if (JSON.parse(cacheToken) !== refreshTokenArgs) {
+      throw new UnauthorizedException('token令牌非法，请重新登录！');
+    }
+    const userInfo = await this.userService.repository.findOneBy({
+      id: Number(session.currentUserInfo.id),
+    });
+    if (!userInfo) throw new BusinessException('当前用户不存在');
+    const { refreshToken, accessToken } = await this.generateTokens(userInfo);
+    return responseMessage({ refreshToken, accessToken, userInfo });
   }
 }

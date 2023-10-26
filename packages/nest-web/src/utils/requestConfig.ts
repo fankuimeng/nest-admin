@@ -14,6 +14,7 @@ import { isSuccess, logoutToLogin } from ".";
 import LocalStorage from "./storage";
 import { BASEURL_API } from "./const";
 import { LOCAL_STORAGE, REQUEST_CODE, Res } from "@/services/global/typeing";
+import { getRefreshToken } from "@/services/user/service";
 
 /**
  * @description: 防抖函数统一处理异常错误
@@ -39,8 +40,9 @@ export const requestConfig: RequestConfig = {
       }
     },
     // 错误接收及处理
-    errorHandler: (error: RequestError, opts: RequestOptions) => {
+    errorHandler: async (error: RequestError, opts: RequestOptions) => {
       // 获取报错的响应和请求信息
+      debugger;
       const { response, resquest } = error as any;
       // 配置 skipErrorHandler 会跳过默认的错误处理，用于项目中部分特殊的接口
       if (opts?.skipErrorHandler) throw error;
@@ -52,15 +54,16 @@ export const requestConfig: RequestConfig = {
           // token令牌校验，如果出现这个返回码则退出登录到登录页面
           case REQUEST_CODE.UNAUTHORIZED:
             // 这里加一个防抖
-            Modal.success({
-              title: "登录已失效,请重新登录!",
-              content: data.msg,
-              onOk: () => {
-                // 退出登录返回到登录页
-                logoutToLogin();
-                Modal.destroyAll();
-              },
-            });
+            await refreshToken();
+            // Modal.success({
+            //   title: "登录已失效,请重新登录!",
+            //   content: data.msg,
+            //   onOk: () => {
+            //     // 退出登录返回到登录页
+            //     logoutToLogin();
+            //     Modal.destroyAll();
+            //   },
+            // });
             break;
           default:
             debounceError(response.data.msg || "服务器内部发生错误！");
@@ -100,22 +103,24 @@ export const requestConfig: RequestConfig = {
       // 响应处理
       (response) => {
         // 拦截响应数据，进行个性化处理
-        const { data } = response as unknown as NestAdmin.Res;
+        const { data } = response as unknown as Res;
         // 根据返回状态码，统一处理，需要前端和后端沟通确认
         switch (data.code) {
           // 成功发起请求并成功处理，一般用于数据库字段校验
-          case NestAdmin.REQUEST_CODE.NOSUCCESS:
+          case REQUEST_CODE.NOSUCCESS:
             debounceError(JSON.stringify(data.msg));
             break;
           // 成功发起请求，但是内部处理出现错误
-          case NestAdmin.REQUEST_CODE.BADREQUEST:
+          case REQUEST_CODE.BADREQUEST:
             debounceError(JSON.stringify(data.msg));
             break;
           // 登录信息失效
-          case NestAdmin.REQUEST_CODE.UNAUTHORIZED:
+          case REQUEST_CODE.UNAUTHORIZED:
             // 退出登录返回到登录页
-            logoutToLogin();
-            Modal.destroyAll();
+            debugger;
+            refreshToken().then((res) => {});
+            // logoutToLogin();
+            // Modal.destroyAll();
             break;
         }
         // 进度条结束
@@ -175,6 +180,23 @@ export const httpRequest = {
   ): Promise<Res<T>> {
     return request(url, { method: "PATCH", data, ...config });
   },
+};
+
+// 用刷新token 换取权限token
+const refreshToken = async () => {
+  debugger;
+  const refreshToken = LocalStorage.getLocalStorageItem<string>(
+    LOCAL_STORAGE.REFRESH_TOKEN,
+  );
+  const res = await getRefreshToken(`${refreshToken}`);
+  LocalStorage.setLocalStorageItem(
+    LOCAL_STORAGE.ACCESS_TOKEN,
+    res.data?.accessToken,
+  );
+  LocalStorage.setLocalStorageItem(
+    LOCAL_STORAGE.REFRESH_TOKEN,
+    res.data?.refreshToken,
+  );
 };
 
 export default requestConfig;

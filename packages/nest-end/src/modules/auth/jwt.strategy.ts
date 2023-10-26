@@ -25,13 +25,18 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(req: Request, payload: User): Promise<User> {
+  async validate(
+    req: Request,
+    payload: User & { username: string; userId: number },
+  ): Promise<User> {
     // 获取当前 token
     const originToken = ExtractJwt.fromAuthHeaderAsBearerToken()(req);
     // 获取 redis 存储的 token
     const cacheToken = await this.redisService.getValue(
-      `${payload.id}-${payload.name}`,
+      `${payload.userId}-${payload.username}`,
     );
+    console.log(JSON.parse(cacheToken) === originToken);
+
     // token 已过期
     if (!cacheToken) {
       throw new UnauthorizedException('token令牌已过期，请重新登录！');

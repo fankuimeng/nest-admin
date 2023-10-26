@@ -105,7 +105,10 @@ export class AuthController {
   }
 
   @Get('refresh')
-  async refresh(@Query('refreshToken') refreshToken: string) {
-    return this.authService.refresh(refreshToken);
+  async refresh(
+    @Query('refreshToken') refreshToken: string,
+    @Session() session: SessionModel,
+  ) {
+    return this.authService.refresh(refreshToken, session);
   }
 }

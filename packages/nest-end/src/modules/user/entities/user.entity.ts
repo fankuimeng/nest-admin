@@ -60,6 +60,7 @@ export class User extends BaseEntities {
   @Column('varchar', {
     name: 'password',
     comment: '密码',
+    select: false,
     length: 255,
   })
   password?: string;

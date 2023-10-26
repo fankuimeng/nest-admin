@@ -44,7 +44,12 @@ export class Logger extends BaseEntities {
   method: RequestMode | string;
 
   // 请求地址
-  @Column({ type: 'varchar', length: 20, nullable: false, comment: '请求地址' })
+  @Column({
+    type: 'varchar',
+    length: 100,
+    nullable: false,
+    comment: '请求地址',
+  })
   api_url: string;
 
   @JoinColumn({
