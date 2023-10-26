@@ -20,44 +20,44 @@ export type GetRepositoryTransactionReturnType<T> = <U = any>(
 ) => Promise<U>;
 
 //  抛错自动事务回滚
-export const getRepositoryTransaction = async <T>(
-  manager: EntityManager,
-  entity: EntityTarget<T>,
-): Promise<GetRepositoryTransactionReturnType<T>> => {
-  return Promise.resolve(async (queryRunnerCallback, options) => {
-    const repository = manager.getRepository(entity);
-    const queryRunner = manager.connection.createQueryRunner();
-    queryRunner.startTransaction();
-    try {
-      const result = await queryRunnerCallback(repository);
-      await queryRunner.commitTransaction();
-      const res = options?.successCallback
-        ? options?.successCallback?.(result)
-        : options.successMsg
-        ? responseMessage(
-            result,
-            options.successLog,
-            options.successMsg,
-            options.successCode,
-          )
-        : result;
-      return res;
-    } catch (error) {
-      const errorCallbackResult = options?.errorCallback?.(error) || {
-        msg: options?.errorMsg,
-        code: options?.errorCode || -1,
-      };
-      await queryRunner.rollbackTransaction();
-      throw new BusinessException(
-        errorCallbackResult.msg || error.message,
-        errorCallbackResult?.code,
-      );
-    } finally {
-      await queryRunner.release();
-      options?.finallyCallback?.();
-    }
-  });
-};
+  export const getRepositoryTransaction = async <T>(
+    manager: EntityManager,
+    entity: EntityTarget<T>,
+  ): Promise<GetRepositoryTransactionReturnType<T>> => {
+    return Promise.resolve(async (queryRunnerCallback, options) => {
+      const repository = manager.getRepository(entity);
+      const queryRunner = manager.connection.createQueryRunner();
+      const start = await queryRunner.startTransaction();
+      try {
+        const result = await queryRunnerCallback(repository);
+        const res = options?.successCallback
+          ? options?.successCallback?.(result)
+          : options?.successMsg
+          ? responseMessage(
+              result,
+              options?.successLog,
+              options?.successMsg,
+              options?.successCode,
+            )
+          : result;
+        await queryRunner.commitTransaction();
+        return res;
+      } catch (error) {
+        await queryRunner.rollbackTransaction();
+        const errorCallbackResult = options?.errorCallback?.(error) || {
+          msg: options?.errorMsg,
+          code: options?.errorCode || -1,
+        };
+        throw new BusinessException(
+          errorCallbackResult.msg || error.message,
+          errorCallbackResult?.code,
+        );
+      } finally {
+        await queryRunner.release();
+        options?.finallyCallback?.();
+      }
+    });
+  };
 
 //  手动动事务回滚
 // export const getConnectionTransaction = async <T>(

@@ -42,6 +42,7 @@ export class AuthService {
     const { accessToken, refreshToken } = await this.generateTokens(user);
     // 执行更新操作 // 将登录次数+1
     const newUser = await this.userService.saveOne({
+      ...user,
       loginLastIp: ip,
       loginLastTime: new Date(),
       id: user.id,
@@ -51,6 +52,8 @@ export class AuthService {
     session.currentUserInfo = newUser as User;
 
     // 将用户 token 保存到 redis
+    console.log(this.configService.get('JWT_ACCESS_TOKEN_EXPIRES_TIME'));
+    
     await this.redisService.setValue(
       `${user.id}-${user.name}`,
       accessToken,
@@ -59,7 +62,7 @@ export class AuthService {
     await this.redisService.setValue(
       `refreshToken-${user.id}`,
       refreshToken,
-      Number(this.configService.get('JWT_ACCESS_TOKEN_EXPIRES_TIME')),
+      Number(this.configService.get('JWT_REFRESH_TOKEN_EXPIRES_TIME')),
     );
     return responseMessage(
       { userInfo: newUser, accessToken, refreshToken },
@@ -93,6 +96,7 @@ export class AuthService {
     const userinfo = await this.userService.findOne({
       where: {
         name,
+        password: md5(password),
         isAdmin: type,
       },
       select: { password: false },
@@ -100,24 +104,22 @@ export class AuthService {
     });
     if (!userinfo)
       throw new BusinessException(
-        '用户不存在，请注册',
-        HttpStatus.UNAUTHORIZED,
+        '用户或密码错误，请重新登录',
+        HttpStatus.FORBIDDEN,
       );
-    if (md5(password) !== userinfo.password)
-      throw new BusinessException('输入密码错误', HttpStatus.UNAUTHORIZED);
 
     const redisCaptcha = await this.redisService.getValue(
       `captcha_${userinfo.email}`,
     );
     if (!userinfo.isAdmin && !redisCaptcha)
-      throw new BusinessException('验证码已失效', HttpStatus.UNAUTHORIZED);
+      throw new BusinessException('验证码已失效', HttpStatus.FORBIDDEN);
 
     if (!userinfo.isAdmin && redisCaptcha !== captcha)
-      throw new BusinessException('验证码不正确', HttpStatus.UNAUTHORIZED);
+      throw new BusinessException('验证码不正确', HttpStatus.FORBIDDEN);
     if (userinfo?.isDisable)
       throw new BusinessException(
         '当前用户已被禁用,请联系管理员',
-        HttpStatus.UNAUTHORIZED,
+        HttpStatus.FORBIDDEN,
       );
     return userinfo;
   }

@@ -1,40 +1,39 @@
-import { GithubOutlined } from '@ant-design/icons';
-import { DefaultFooter } from '@ant-design/pro-components';
-import { useIntl } from '@umijs/max';
-import React from 'react';
+import { GithubOutlined } from "@ant-design/icons";
+import { DefaultFooter } from "@ant-design/pro-components";
+
+import styles from "./index.module.less";
 
 const Footer: React.FC = () => {
-  const intl = useIntl();
-  const defaultMessage = intl.formatMessage({
-    id: 'app.copyright.produced',
-    defaultMessage: '蚂蚁集团体验技术部出品',
-  });
-
   const currentYear = new Date().getFullYear();
 
   return (
     <DefaultFooter
-      style={{
-        background: 'none',
-      }}
-      copyright={`${currentYear} ${defaultMessage}`}
+      style={{ background: "none" }}
+      copyright={`${currentYear} 哈哈哈丶 by 843348394@qq.com`}
+      className={styles["global-footer"]}
       links={[
         {
-          key: 'Ant Design Pro',
-          title: 'Ant Design Pro',
-          href: 'https://pro.ant.design',
+          key: "哈哈哈丶",
+          title: "哈哈哈丶",
+          href: "https://baiwumm.com/",
           blankTarget: true,
         },
         {
-          key: 'github',
+          key: "github",
           title: <GithubOutlined />,
-          href: 'https://github.com/ant-design/ant-design-pro',
+          href: "https://github.com/baiwumm/Xmw-Admin/",
           blankTarget: true,
         },
         {
-          key: 'Ant Design',
-          title: 'Ant Design',
-          href: 'https://ant.design',
+          key: "Vue3 Admin",
+          title: "Vue3 Admin",
+          href: "https://github.com/baiwumm/Vue3-Admin/",
+          blankTarget: true,
+        },
+        {
+          key: "Vue2 Admin",
+          title: "Vue2 Admin",
+          href: "https://github.com/baiwumm/Vue2-Admin/",
           blankTarget: true,
         },
       ]}

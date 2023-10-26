@@ -38,14 +38,14 @@ export class UserService extends BaseService<User> {
   async initData() {
     const user1 = new User();
     user1.name = 'admin';
-    user1.password = md5('111111');
+    user1.password = md5('123456');
     user1.email = 'xxx@xx.com';
     user1.isAdmin = 1;
     user1.nickname = 'admin';
 
     const user2 = new User();
-    user2.name = 'lisi';
-    user2.password = md5('222222');
+    user2.name = 'user';
+    user2.password = md5('123456');
     user2.email = 'yy@yy.com';
     user2.nickname = '李四';
 

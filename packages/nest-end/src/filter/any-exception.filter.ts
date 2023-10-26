@@ -18,12 +18,12 @@ export interface ApiError {
 }
 
 // @Catch() 装饰器绑定所需的元数据到异常过滤器上。它告诉 Nest这个特定的过滤器正在寻找
-@Catch(Error)
+@Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
   @Inject(LoggerService)
   private loggerService: LoggerService;
   // ArgumentsHost叫做参数主机，它是一个实用的工具 这里我们使用 它的一个方法来获取上下文ctx
-  catch(exception: Error, host: Partial<ArgumentsHost>) {
+  catch(exception: any, host: Partial<ArgumentsHost>) {
     let body: ApiError;
     let status: HttpStatus;
     // 获取上下文
@@ -32,19 +32,23 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     // 获取请求体
     const request = ctx.getRequest<Request>();
-    console.log(console.error(exception), exception.message, exception.stack);
 
     if (exception instanceof BusinessException) {
       // 直接处理我们自己的异常
       body = {
         id: exception.id,
-        message: request.originalUrl,
+        message: exception.message,
         domain: exception.domain,
         timestamp: exception.timestamp,
       };
+      status = exception.status;
     } else if (exception instanceof HttpException) {
+      const res = exception.getResponse() as any;
+      const message = Array.isArray(res?.message)
+        ? res?.message?.join?.()
+        : res?.message;
       body = new BusinessException(
-        exception.message || '服务异常',
+        message || exception.message || '服务异常',
         exception.getStatus(),
         exception.message || request.originalUrl, // 如果你喜欢，也可以选择普通消息
         'http',
@@ -73,6 +77,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
         --------------------- 异常日志 ---------------------
         `;
     // 自定义异常返回体logFormat
+
     response
       .status(status)
       .json(
