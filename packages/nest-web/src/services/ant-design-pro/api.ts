@@ -1,17 +1,7 @@
 // @ts-ignore
 /* eslint-disable */
-import { request } from "@umijs/max";
+import { request } from "@/utils/request";
 import { USERMANAGEMENT } from "../user/typeing";
-
-/** 获取当前的用户 GET /api/currentUser */
-export async function currentUser(options?: { [key: string]: any }) {
-  return request<{
-    data: USERMANAGEMENT;
-  }>("/user/current-user", {
-    method: "GET",
-    ...(options || {}),
-  });
-}
 
 /** 退出登录接口 POST /api/login/outLogin */
 export async function outLogin(options?: { [key: string]: any }) {

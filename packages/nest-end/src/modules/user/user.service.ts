@@ -1,4 +1,4 @@
-import { Get, Inject, Injectable } from '@nestjs/common';
+import { Get, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PageQueryType, SessionModel } from 'src/typinng/global';
 import { EntityManager, Repository, SelectQueryBuilder } from 'typeorm';
 import { User } from './entities/user.entity';
@@ -74,6 +74,7 @@ export class UserService extends BaseService<User> {
   }
 
   async currentUser(session: SessionModel) {
+    // throw new UnauthorizedException('token令牌非法，请重新登录1！');
     return responseMessage(session.currentUserInfo);
   }
 }

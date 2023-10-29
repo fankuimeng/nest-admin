@@ -29,6 +29,7 @@ type PageParams = {
   current?: number;
   pageSize?: number;
 };
+
 export type InitialStateTypes = {
   Locales?: Record<string, any>;
   Access_token?: string;
@@ -104,25 +105,6 @@ export interface Res<T = any> {
   code: number;
   msg: string;
   data?: T;
-}
-export enum REQUEST_CODE {
-  NOSUCCESS = -1, // 表示请求成功，但操作未成功
-  SUCCESS = 200, // 表示请求成功
-  BADREQUEST = 400, // 表示客户端发送的请求有错误
-  UNAUTHORIZED = 401, // 表示客户端未提供身份验证凭据或身份验证凭据不正确
-  NOTFOUND = 404, // 表示服务器无法找到请求的资源
-  INTERNALSERVERERROR = 500, // 表示服务器内部错误
-}
-
-/**
- * @description: 存储在 localstorage 的 key
- */
-export enum LOCAL_STORAGE {
-  USER_INFO = "USER_INFO", // 用户信息
-  ACCESS_TOKEN = "ACCESS_TOKEN", // ACCESS_TOKEN
-  REFRESH_TOKEN = "REFRESH_TOKEN", // refreshToken
-  LAYOUT = "LAYOUT", // 布局
-  LOCK_SLEEP = "LOCK_SLEEP", // 睡眠
 }
 
 export type LockSleepTypes = {

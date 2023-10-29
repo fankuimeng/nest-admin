@@ -104,9 +104,9 @@ export class AuthController {
     return this.authService.login(userInfo, ip, session);
   }
 
-  @Get('refresh')
+  @Post('refresh')
   async refresh(
-    @Query('refreshToken') refreshToken: string,
+    @Body('refreshToken') refreshToken: string,
     @Session() session: SessionModel,
   ) {
     return this.authService.refresh(refreshToken, session);

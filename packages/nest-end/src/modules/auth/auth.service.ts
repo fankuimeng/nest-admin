@@ -49,18 +49,6 @@ export class AuthService {
     });
     // 将数据保存到session
     session.currentUserInfo = newUser as User;
-
-    // 将用户 token 保存到 redis
-    await this.redisService.setValue(
-      `${user.id}-${user.name}`,
-      accessToken,
-      Number(this.configService.get('JWT_ACCESS_TOKEN_EXPIRES_TIME')),
-    );
-    await this.redisService.setValue(
-      `refreshToken-${user.id}`,
-      refreshToken,
-      Number(this.configService.get('JWT_REFRESH_TOKEN_EXPIRES_TIME')),
-    );
     return responseMessage(
       { userInfo: { ...newUser, password: null }, accessToken, refreshToken },
       '登录成功',
@@ -140,7 +128,17 @@ export class AuthService {
         secret: this.configService.get('JWT_SECRET'),
       },
     );
-
+    // 将用户 token 保存到 redis
+    await this.redisService.setValue(
+      `${userInfo.id}-${userInfo.name}`,
+      accessToken,
+      Number(this.configService.get('JWT_ACCESS_TOKEN_EXPIRES_TIME')),
+    );
+    await this.redisService.setValue(
+      `refreshToken-${userInfo.id}`,
+      refreshToken,
+      Number(this.configService.get('JWT_REFRESH_TOKEN_EXPIRES_TIME')),
+    );
     return { refreshToken, userInfo, accessToken };
   }
 
@@ -162,6 +160,7 @@ export class AuthService {
     });
     if (!userInfo) throw new BusinessException('当前用户不存在');
     const { refreshToken, accessToken } = await this.generateTokens(userInfo);
+
     return responseMessage({ refreshToken, accessToken, userInfo });
   }
 }

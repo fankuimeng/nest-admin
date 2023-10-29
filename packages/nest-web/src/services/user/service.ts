@@ -1,6 +1,6 @@
-import { LoginParams, LoginResultType } from "./typeing";
+import { LoginParams, LoginResultType, USERMANAGEMENT } from "./typeing";
 import { Res } from "../global/typeing";
-import { request } from "@umijs/max";
+import { request } from "@/utils/request";
 
 /** 登录接口 POST /api/login/account */
 export async function login(
@@ -20,8 +20,13 @@ export async function getRefreshToken(
   options?: { [key: string]: any },
 ) {
   return request<Res<LoginResultType>>("/auth/refresh", {
-    params: { refreshToken },
+    data: { refreshToken },
     method: "POST",
     ...(options || {}),
   });
+}
+
+/** 获取当前的用户 GET /api/currentUser */
+export async function queryCurrentUser(options?: { [key: string]: any }) {
+  return request<Res<USERMANAGEMENT>>("/user/current-user", options || {});
 }

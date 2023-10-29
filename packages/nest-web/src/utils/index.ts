@@ -2,12 +2,8 @@ import { eq } from "lodash-es";
 import LocalStorage from "./storage";
 import { history } from "@umijs/max";
 import { stringify } from "querystring";
-import {
-  LOCAL_STORAGE,
-  LockSleepTypes,
-  REQUEST_CODE,
-  ROUTES,
-} from "@/services/global/typeing";
+import { LockSleepTypes, ROUTES } from "@/services/global/typeing";
+import { LOCAL_STORAGE, REQUEST_CODE } from "./const";
 
 export const isSuccess = (code?: number): boolean =>
   eq(code, REQUEST_CODE.SUCCESS);

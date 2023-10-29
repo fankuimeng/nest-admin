@@ -11,10 +11,10 @@ import { SettingDrawer } from "@ant-design/pro-components";
 import type { RunTimeLayoutConfig } from "@umijs/max";
 import { history, Link } from "@umijs/max";
 import defaultSettings from "../config/defaultSettings";
-import { currentUser as queryCurrentUser } from "@/services/ant-design-pro/api";
 import React from "react";
-import requestConfig from "./utils/requestConfig";
 import { USERMANAGEMENT } from "./services/user/typeing";
+import { requestConfig } from "./utils/request";
+import { queryCurrentUser } from "./services/user/service";
 const isDev = process.env.NODE_ENV === "development";
 const loginPath = "/user/login";
 
@@ -28,15 +28,11 @@ export async function getInitialState(): Promise<{
   fetchUserInfo?: () => Promise<USERMANAGEMENT | undefined>;
 }> {
   const fetchUserInfo = async () => {
-    try {
-      const msg = await queryCurrentUser({
-        skipErrorHandler: true,
-      });
-      return msg.data;
-    } catch (error) {
-      history.push(loginPath);
-    }
-    return undefined;
+    const res = await queryCurrentUser({
+      skipErrorHandler: true,
+    });
+    console.log("🚀 ~ file: app.tsx:34 ~ fetchUserInfo ~ res:", res);
+    return res.data;
   };
   // 如果不是登录页面，执行
   const { location } = history;
@@ -53,12 +49,10 @@ export async function getInitialState(): Promise<{
     settings: defaultSettings as Partial<LayoutSettings>,
   };
 }
-// ProLayout 支持的api https://procomponents.ant.design/components/layout
 export const layout: RunTimeLayoutConfig = ({
   initialState,
   setInitialState,
 }) => {
-  console.log("🚀 ~ file: app.tsx:61 ~ initialState:", initialState);
   return {
     actionsRender: () => [
       <Question key="doc" />,
