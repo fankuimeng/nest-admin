@@ -14,3 +14,8 @@ export enum RES_CODE {
 }
 
 export const EMPTY_RESPONSE_LIST = { list: [], total: 0 };
+
+
+export enum DATE_FORMATE {
+  DATE = 'YYYY-MM-DD hh:mm:ss',
+}

@@ -17,11 +17,10 @@ import { Col, message, Row } from "antd";
 import React from "react";
 import { flushSync } from "react-dom";
 import styles from "./index.module.less"; // css 样式恩建
-import { login } from "@/services/user/service";
-import { LoginParams } from "@/services/user/typeing";
 
 import LocalStorage from "@/utils/storage";
-import { LOCAL_STORAGE } from "@/utils/const";
+import { LOCAL_STORAGE } from "@/service/enum";
+import { AuthControllerSignin } from "@/service/auth/api";
 const Login: React.FC = () => {
   const { initialState, setInitialState } = useModel("@@initialState");
 
@@ -39,51 +38,45 @@ const Login: React.FC = () => {
     }
   };
 
-  const { run: runLogin, loading: loginLoading } = useRequest(login, {
-    manual: true,
-    onSuccess: async (data, params) => {
-      const { accessToken, refreshToken } = data || {};
-      LocalStorage.setLocalStorageItem(LOCAL_STORAGE.ACCESS_TOKEN, accessToken);
-      LocalStorage.setLocalStorageItem(
-        LOCAL_STORAGE.REFRESH_TOKEN,
-        refreshToken,
-      );
-      const defaultLoginSuccessMessage = intl.formatMessage({
-        id: "pages.login.success",
-        defaultMessage: "登录成功！",
-      });
-      // await setInitialState((s: any) => ({
-      //   ...s,
-      //   currentUser: data?.userInfo as USERMANAGEMENT,
-      // })); // 路由跳转
-      message.success(defaultLoginSuccessMessage);
-      await fetchUserInfo();
-      const urlParams = new URL(window.location.href).searchParams;
-      history.push(urlParams.get("redirect") || "/");
-      return;
+  const { run: runLogin, loading: loginLoading } = useRequest(
+    AuthControllerSignin,
+    {
+      manual: true,
+      onSuccess: async (data, params) => {
+        const { accessToken, refreshToken } = data || {};
+        LocalStorage.setLocalStorageItem(
+          LOCAL_STORAGE.ACCESS_TOKEN,
+          accessToken,
+        );
+        LocalStorage.setLocalStorageItem(
+          LOCAL_STORAGE.REFRESH_TOKEN,
+          refreshToken,
+        );
+        const defaultLoginSuccessMessage = intl.formatMessage({
+          id: "pages.login.success",
+          defaultMessage: "登录成功！",
+        });
+        // await setInitialState((s: any) => ({
+        //   ...s,
+        //   currentUser: data?.userInfo as USERMANAGEMENT,
+        // })); // 路由跳转
+        message.success(defaultLoginSuccessMessage);
+        await fetchUserInfo();
+        const urlParams = new URL(window.location.href).searchParams;
+        history.push(urlParams.get("redirect") || "/");
+        return;
+      },
     },
-  });
+  );
 
   /**
    * @description: 登录表单提交
    * @param {LoginParams} values
    */
-  const handleSubmit = async (values: LoginParams) => {
+  const handleSubmit = async (values: NESTADMIN.AuthUserRegisterDto) => {
     try {
       // 登录
-      runLogin({ ...values, type: 1 });
-      // const msg = await login({ ...values });
-      // if (msg.status === "ok") {
-      //   const defaultLoginSuccessMessage = intl.formatMessage({
-      //     id: "pages.login.success",
-      //     defaultMessage: "登录成功！",
-      //   });
-      //   message.success(defaultLoginSuccessMessage);
-      //   await fetchUserInfo();
-      //   const urlParams = new URL(window.location.href).searchParams;
-      //   history.push(urlParams.get("redirect") || "/");
-      //   return;
-      // }
+      runLogin({ ...values, isAdmin: 1 });
     } catch (error) {
       const defaultLoginFailureMessage = intl.formatMessage({
         id: "pages.login.failure",
@@ -105,7 +98,7 @@ const Login: React.FC = () => {
           <div className={styles["login-bg"]} />
         </Col>
         <Col className={styles["login-form"]}>
-          <LoginForm<LoginParams>
+          <LoginForm<NESTADMIN.AuthUserRegisterDto>
             logo={<img alt="logo" src="/logo.svg" />}
             title="Admin"
             submitter={{

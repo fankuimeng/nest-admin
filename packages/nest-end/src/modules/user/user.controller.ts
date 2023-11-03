@@ -14,7 +14,9 @@ import { User } from './entities/user.entity';
 import { BaseController } from '../base/base.controller';
 import { AuthGuard } from '@nestjs/passport';
 import { SessionModel } from 'src/typinng/global';
-
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { UserCurrentResponseVo } from './dto/response.vo';
+@ApiTags('User-用户模块')
 @Controller('user')
 export class UserController extends BaseController<User> {
   constructor(private readonly userService: UserService) {
@@ -27,6 +29,8 @@ export class UserController extends BaseController<User> {
     return await this.userService.initData();
   }
 
+  @ApiOkResponse({ type: UserCurrentResponseVo })
+  @ApiOperation({ summary: '获取当前用户' })
   @Get('current-user')
   @UseGuards(AuthGuard('jwt'))
   async currentUser(@Session() session: SessionModel) {

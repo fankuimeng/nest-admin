@@ -12,9 +12,8 @@ import type { RunTimeLayoutConfig } from "@umijs/max";
 import { history, Link } from "@umijs/max";
 import defaultSettings from "../config/defaultSettings";
 import React from "react";
-import { USERMANAGEMENT } from "./services/user/typeing";
 import { requestConfig } from "./utils/request";
-import { queryCurrentUser } from "./services/user/service";
+import { UserControllerCurrentUser } from "./service/user/api";
 const isDev = process.env.NODE_ENV === "development";
 const loginPath = "/user/login";
 
@@ -23,15 +22,14 @@ const loginPath = "/user/login";
  * */
 export async function getInitialState(): Promise<{
   settings?: Partial<LayoutSettings>;
-  currentUser?: USERMANAGEMENT;
+  currentUser?: NESTADMIN.User;
   loading?: boolean;
-  fetchUserInfo?: () => Promise<USERMANAGEMENT | undefined>;
+  fetchUserInfo?: () => Promise<NESTADMIN.User | undefined>;
 }> {
   const fetchUserInfo = async () => {
-    const res = await queryCurrentUser({
+    const res = await UserControllerCurrentUser({
       skipErrorHandler: true,
     });
-    console.log("🚀 ~ file: app.tsx:34 ~ fetchUserInfo ~ res:", res);
     return res.data;
   };
   // 如果不是登录页面，执行

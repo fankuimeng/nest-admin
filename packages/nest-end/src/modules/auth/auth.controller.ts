@@ -10,10 +10,12 @@ import {
   Res,
   Req,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
   ApiBearerAuth,
+  ApiBody,
   ApiHeader,
   ApiOkResponse,
   ApiOperation,
@@ -23,23 +25,18 @@ import { responseMessage } from 'src/utils';
 import * as svgCaptcha from 'svg-captcha';
 import { RedisService } from '../redis/redis.service';
 import { EmailService } from '../common/email.service';
-import {
-  AdminLoginResponseDto,
-  UserLoginDto,
-  UserRegisterDto,
-  VerifyCodeResponseDto,
-} from './typing/user';
-import { ResponseDto } from 'src/dto/response.dto';
+
 import { SessionModel } from 'src/typinng/global';
 import { IpAddress } from 'src/utils/requestIp';
+import {
+  AuthLoginResponseVo,
+  AuthVerifyCodeResponseVo,
+} from './dto/response.vo';
+import { ResponseVo } from '../base/dto/response.vo';
+import { AuthRefreshTokenDto, AuthUserRegisterDto } from './dto/request.dto';
+import { AuthGuard } from '@nestjs/passport';
 
-@ApiTags('用户登录模块')
-@ApiHeader({
-  name: 'Authorization',
-  required: true,
-  description: 'token令牌',
-})
-@ApiBearerAuth()
+@ApiTags('Auth-用户权限模块')
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -48,7 +45,7 @@ export class AuthController {
     private readonly emailService: EmailService,
   ) {}
 
-  @ApiOkResponse({ type: VerifyCodeResponseDto })
+  @ApiOkResponse({ type: AuthVerifyCodeResponseVo })
   @ApiOperation({ summary: '获取图形验证码' })
   @Get('/verify-code') //当请求该接口时，返回一张随机图片验证码
   async getCaptcha(@Req() req, @Res() res) {
@@ -73,14 +70,16 @@ export class AuthController {
     return await responseMessage(captcha.data); //给页面返回一张图片
   }
 
+  @ApiOkResponse({ type: AuthLoginResponseVo })
+  @ApiOperation({ summary: '用户注册' })
   @Post('register')
-  async register(@Body() registerUser: UserRegisterDto) {
+  async register(@Body() registerUser: AuthUserRegisterDto) {
     return this.authService.register(registerUser);
   }
 
-  @ApiOkResponse({ type: ResponseDto })
+  @ApiOkResponse({ type: ResponseVo<String> })
   @ApiOperation({ summary: '获取邮箱验证码' })
-  @Get('register-captcha')
+  @Get('register-email')
   async captcha(@Query('address') address: string) {
     const code = Math.random().toString().slice(2, 8);
     this.redisService.setValue(`captcha_${address}`, code, 5 * 60);
@@ -93,22 +92,35 @@ export class AuthController {
   }
 
   // 登录
-  @ApiOkResponse({ type: AdminLoginResponseDto })
+  @ApiOkResponse({
+    type: AuthLoginResponseVo,
+  })
   @ApiOperation({ summary: '获取登录后的用户权限信息' })
   @Post('login')
   async signin(
-    @Body() userInfo: UserLoginDto,
+    @Body() authUserRegisterDto: AuthUserRegisterDto,
     @IpAddress() ip: string,
     @Session() session: SessionModel,
   ) {
-    return this.authService.login(userInfo, ip, session);
+    return this.authService.login(authUserRegisterDto, ip, session);
   }
 
+  @ApiBearerAuth()
+  @ApiHeader({
+    name: 'Authorization',
+    required: true,
+    description: 'token令牌',
+  })
+  @ApiOkResponse({
+    type: AuthLoginResponseVo,
+  })
+  @ApiOperation({ summary: '刷新tpken' })
+  @UseGuards(AuthGuard('jwt'))
   @Post('refresh')
   async refresh(
-    @Body('refreshToken') refreshToken: string,
+    @Body() authRefreshTokenDto: AuthRefreshTokenDto,
     @Session() session: SessionModel,
   ) {
-    return this.authService.refresh(refreshToken, session);
+    return this.authService.refresh(authRefreshTokenDto.refreshToken, session);
   }
 }

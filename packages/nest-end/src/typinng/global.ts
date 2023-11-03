@@ -1,6 +1,4 @@
-import { UserAttributes } from './system';
-import { type } from 'os';
-import { ListBaseDto } from 'src/modules/base/dto/list-base.dto';
+import { ListBaseQueryDto } from 'src/modules/base/dto/response.dto';
 import { BaseEntities } from 'src/modules/base/entities/base.entity';
 import { User } from 'src/modules/user/entities/user.entity';
 
@@ -45,6 +43,6 @@ export type SessionModel = {
 
 export type InstanceEntities<T, U = BaseEntities> = Partial<T> & Partial<U>;
 
-export type PageQueryType<T, U = object> = ListBaseDto &
+export type PageQueryType<T, U = object> = ListBaseQueryDto &
   InstanceEntities<T> &
   U;

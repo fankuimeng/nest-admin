@@ -19,6 +19,8 @@ export class BaseEntities {
   @Column({
     name: 'create_time',
     type: 'timestamp',
+    comment: '创建时间',
+
     default: () => 'CURRENT_TIMESTAMP',
   })
   createTime: string;

@@ -9,7 +9,7 @@ import * as express from 'express';
 import { join } from 'path';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { TimeoutInterceptor } from './interceptors/timeout.interceptor';
-import { LoggerService } from './modules/Logger/logger.service';
+import { LoggerService } from './modules/logger/logger.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -40,7 +40,7 @@ async function bootstrap() {
   //   app.useGlobalInterceptors(new HttpReqTransformInterceptor<ResponseModel>());
 
   // whitelist为true，这样只有用到class-validator里面的注解的属性才能被允许传入接口
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+  app.useGlobalPipes(new ValidationPipe());
 
   // 配置文件访问  文件夹为静态目录，以达到可直接访问下面文件的目的
   const rootDir = join(__dirname, '..');
@@ -88,7 +88,7 @@ async function bootstrap() {
     .setVersion(configService.get('SWAGGER_API_VERSION'))
     .build();
   const document = SwaggerModule.createDocument(app, options);
-  SwaggerModule.setup(process.env.SWAGGER_SETUP_PATH, app, document);
+  SwaggerModule.setup('doc', app, document);
 
   await app.listen(configService.get('APP_PROT'), () => {
     loggerService.logger(

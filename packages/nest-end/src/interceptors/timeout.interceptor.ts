@@ -18,7 +18,7 @@ import {
 export class TimeoutInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
-      timeout(1000 * 60),
+      timeout(1000 * 30),
       catchError((err) => {
         if (err instanceof TimeoutError) {
           return throwError(
@@ -26,7 +26,6 @@ export class TimeoutInterceptor implements NestInterceptor {
               new HttpException({ message: "'请求超时'" }, HttpStatus.FOUND),
           );
         }
-
         return throwError(() => err);
       }),
     );

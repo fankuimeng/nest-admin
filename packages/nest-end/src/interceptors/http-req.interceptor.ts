@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { LoggerService } from 'src/modules/Logger/logger.service';
+import { LoggerService } from 'src/modules/logger/logger.service';
 
 import { ResponseModel } from 'src/typinng/global';
 

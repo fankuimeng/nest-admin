@@ -6,7 +6,7 @@ import {
   HttpStatus,
   Inject,
 } from '@nestjs/common';
-import { LoggerService } from 'src/modules/Logger/logger.service';
+import { LoggerService } from 'src/modules/logger/logger.service';
 import { Request, Response } from 'express';
 import { BusinessException, ErrorDomain } from './business.exception';
 

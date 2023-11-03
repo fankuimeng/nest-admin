@@ -2,7 +2,6 @@ import { BaseEntities } from 'src/modules/base/entities/base.entity';
 import { Column, Entity, JoinTable, ManyToMany, OneToMany } from 'typeorm';
 import { Permission } from './rermission.entity';
 
-//  Contains, IsDate, IsEmail, IsFQDN, IsInt, Length, Max, Min;  class-validator
 @Entity()
 export class Role extends BaseEntities {
   //角色编码

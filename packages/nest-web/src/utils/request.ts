@@ -13,15 +13,14 @@ import { debounce } from "lodash-es"; // lodash 工具函数
 import Nprogress from "nprogress";
 import { isSuccess, logoutToLogin } from ".";
 import LocalStorage from "./storage";
-import { Res } from "@/services/global/typeing";
-import { getRefreshToken } from "@/services/user/service";
 import {
   CODE_MESSAGE,
   LOCAL_STORAGE,
   REQUEST_CODE,
   REQUEST_CONFIG,
   RequestMEthOD,
-} from "./const";
+} from "@/service/enum";
+import { AuthControllerRefresh } from "@/service/auth/api";
 
 /**
  * @description: 导出封装的请求方法
@@ -35,7 +34,7 @@ class RequestConfig {
   static timeout = REQUEST_CONFIG.BASEURL_API; // 超时时间，默认 30 s
   static errorConfig = {
     // 错误抛出
-    errorThrower: (res: Res) => {
+    errorThrower: (res: NESTADMIN.ResponseVo) => {
       const { code, msg } = res;
       if (!isSuccess(code)) {
         throw new Error(msg); // 抛出自制的错误
@@ -53,7 +52,8 @@ class RequestConfig {
       if (response) {
         const { data } = response;
         const code = `CODE_${data.code}` as "CODE_201";
-        const message = CODE_MESSAGE[code] || "服务器内部发生错误！";
+        const message =
+          data?.msg || CODE_MESSAGE[code] || "服务器内部发生错误！";
         RequestConfig.debounceError(message);
       } else if (resquest) {
         RequestConfig.debounceError(CODE_MESSAGE.CODE_FAIL);
@@ -82,7 +82,7 @@ class RequestConfig {
   static responseInterceptors = [
     [
       // 响应处理
-      (response: Res) => {
+      (response: NESTADMIN.ResponseVo) => {
         // 拦截响应数据，进行个性化处理
         const { data } = response;
         // 根据返回状态码，统一处理，需要前端和后端沟通确认
@@ -133,6 +133,7 @@ class RequestConfig {
 
   static request<T>(url: string, opts: Record<any, any>): Promise<T> {
     const options: any = { method: "GET", skipErrorHandler: false, ...opts };
+    // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
       const newResolve = resolve as (value: AxiosResponse<T, any>) => void;
       try {
@@ -143,9 +144,11 @@ class RequestConfig {
         const isRefresh =
           response.status === REQUEST_CODE.UNAUTHORIZED &&
           config?.url !== "/auth/refresh";
+        // eslint-disable-next-line no-promise-executor-return
         if (!isRefresh) return reject(error);
         await RequestConfig.refreshToken();
         const res = await umiRequest(url, options).catch(reject);
+        // eslint-disable-next-line no-promise-executor-return
         return newResolve(res as AxiosResponse<any, any>);
       }
     });
@@ -153,11 +156,11 @@ class RequestConfig {
 
   // 用刷新token 换取权限token
   static refreshToken = async () => {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const refreshToken = LocalStorage.getLocalStorageItem<string>(
         LOCAL_STORAGE.REFRESH_TOKEN,
       );
-      getRefreshToken(`${refreshToken}`)
+      AuthControllerRefresh({ refreshToken: `${refreshToken}` })
         .then((res) => {
           LocalStorage.setLocalStorageItem(
             LOCAL_STORAGE.ACCESS_TOKEN,
@@ -189,21 +192,21 @@ class RequestConfig {
       url: string,
       data?: object,
       config?: AxiosRequestConfig,
-    ): Promise<Res<T>> {
+    ): Promise<NESTADMIN.ResponseVo<T>> {
       return RequestConfig.request(url, { method: "PUT", data, ...config });
     },
     delete<T = any>(
       url: string,
       data?: object,
       config?: AxiosRequestConfig,
-    ): Promise<Res<T>> {
+    ): Promise<NESTADMIN.ResponseVo<T>> {
       return RequestConfig.request(url, { method: "DELETE", data, ...config });
     },
     get<T = any>(
       url: string,
       data?: object,
       config?: AxiosRequestConfig,
-    ): Promise<Res<T>> {
+    ): Promise<NESTADMIN.ResponseVo<T>> {
       return RequestConfig.request(url, {
         method: "GET",
         params: data,
@@ -214,14 +217,14 @@ class RequestConfig {
       url: string,
       data?: object,
       config?: AxiosRequestConfig,
-    ): Promise<Res<T>> {
+    ): Promise<NESTADMIN.ResponseVo<T>> {
       return RequestConfig.request(url, { method: "POST", data, ...config });
     },
     patch<T = any>(
       url: string,
       data?: object,
       config?: AxiosRequestConfig,
-    ): Promise<Res<T>> {
+    ): Promise<NESTADMIN.ResponseVo<T>> {
       return RequestConfig.request(url, { method: "PATCH", data, ...config });
     },
   };

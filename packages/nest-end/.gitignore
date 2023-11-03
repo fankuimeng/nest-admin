@@ -38,3 +38,5 @@ lerna-debug.log*
 .env.production 
 /entities
 /logs
+
+./src/*/dist/*.js

@@ -14,7 +14,7 @@ import { AllExceptionsFilter } from './filter/any-exception.filter';
 import { HttpReqTransformInterceptor } from './interceptors/http-req.interceptor';
 import { ResponseModel } from './typinng/global';
 import { RequestContextModule } from 'nestjs-request-context';
-import { LoggerService } from './modules/Logger/logger.service';
+import { LoggerService } from './modules/logger/logger.service';
 import { TransformInterceptor } from './interceptors/transform.interceptor';
 import { JwtModule } from '@nestjs/jwt';
 

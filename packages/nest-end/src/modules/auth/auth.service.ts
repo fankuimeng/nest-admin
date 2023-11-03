@@ -9,17 +9,13 @@ import { UserService } from '../user/user.service';
 import { User } from '../user/entities/user.entity';
 import { md5, responseMessage } from 'src/utils';
 import { RedisService } from '../redis/redis.service';
-import {
-  AdminLoginResponseDto,
-  AdminLoginUserVo,
-  UserInfo,
-  UserLoginDto,
-  UserRegisterDto,
-} from './typing/user';
+;
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { ResponseModel, SessionModel } from 'src/typinng/global';
 import { BusinessException } from 'src/filter/business.exception';
+import { AuthUserRegisterDto } from './dto/request.dto';
+import { AuthLoginResponseType } from './dto/response.vo';
 
 @Injectable()
 export class AuthService {
@@ -36,7 +32,7 @@ export class AuthService {
   @Inject(RedisService)
   private redisService: RedisService;
 
-  async login(userInfo: UserLoginDto, ip, session: SessionModel) {
+  async login(userInfo: AuthUserRegisterDto, ip, session: SessionModel) {
     const user = await this.validateUser(userInfo);
     const { accessToken, refreshToken } = await this.generateTokens(user);
     // 执行更新操作 // 将登录次数+1
@@ -56,7 +52,7 @@ export class AuthService {
     );
   }
 
-  async register(user: UserRegisterDto) {
+  async register(user: AuthUserRegisterDto) {
     const captcha = await this.redisService.getValue(`captcha_${user.email}`);
 
     if (!captcha)
@@ -69,21 +65,26 @@ export class AuthService {
     });
     if (foundUser)
       throw new BusinessException('用户已存在', HttpStatus.BAD_REQUEST);
-    return await this.userService.saveOne(
+    const userInfo = await this.userService.saveOne(
       { ...user, password: md5(user.password) },
       {
         successMsg: '注册用户成功',
         errorCode: HttpStatus.BAD_REQUEST,
       },
     );
+    const { accessToken, refreshToken } = await this.generateTokens({
+      id: userInfo.id,
+      name: userInfo.name,
+    });
+    return responseMessage({ accessToken, refreshToken }, null, '注册用户成功');
   }
-  async validateUser(userInfo: UserLoginDto) {
-    const { name, password, captcha, type = 1 } = userInfo;
+  async validateUser(userInfo: AuthUserRegisterDto) {
+    const { name, password, captcha, isAdmin = 1 } = userInfo;
     const userinfo = await this.userService.findOne({
       where: {
         name,
         password: md5(password),
-        isAdmin: type,
+        isAdmin: isAdmin,
       },
       select: { password: false },
       relations: ['roles', 'roles.permissions'],
@@ -110,7 +111,9 @@ export class AuthService {
     return userinfo;
   }
   // login -> token
-  async generateTokens(userInfo: User): Promise<Partial<AdminLoginUserVo>> {
+  async generateTokens(
+    userInfo: Pick<User, 'id' | 'name'>,
+  ): Promise<AuthLoginResponseType> {
     const accessToken = this.jwtService.sign(
       {
         userId: userInfo.id,
