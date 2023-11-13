@@ -12,7 +12,7 @@ module.exports = {
   entry: path.join(__dirname, './src/main.ts'),
   target: 'node',
   // 置为空即可忽略webpack-node-externals插件
-  externals: ['svg-captch'], // 忽略 svg-captch 的打包
+  externals: ['svg-captch', "sqlite3"], // 忽略 svg-captch 的打包
   // ts文件的处理
   module: {
     rules: [
@@ -50,7 +50,7 @@ module.exports = {
 
   resolve: {
     alias: {
-      '@': path.join(__dirname, 'src'),
+      'src': path.join(__dirname, 'src'),
     },
     extensions: ['.js', '.ts', '.json'],
   },
