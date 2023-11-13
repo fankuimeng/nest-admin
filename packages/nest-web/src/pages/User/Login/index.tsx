@@ -42,7 +42,7 @@ const Login: React.FC = () => {
     AuthControllerSignin,
     {
       manual: true,
-      onSuccess: async (data, params) => {
+      onSuccess: async (data) => {
         const { accessToken, refreshToken } = data || {};
         LocalStorage.setLocalStorageItem(
           LOCAL_STORAGE.ACCESS_TOKEN,

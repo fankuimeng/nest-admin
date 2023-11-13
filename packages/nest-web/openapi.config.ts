@@ -13,7 +13,7 @@ const openApi = [
     hook: {
       afterOpenApiDataInited: (openAPIData: any) => {
         const paths: any = {};
-        Object.entries(openAPIData?.paths)?.map?.(([k, v]) => {
+        Object.entries(openAPIData?.paths)?.forEach?.(([k, v]) => {
           paths[k.replace("/v1", "/api")] = v;
         });
         return { ...openAPIData, paths };

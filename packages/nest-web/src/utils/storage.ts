@@ -12,7 +12,7 @@ export default class LocalStorage {
     // 获取 值
     const item = localStorage.getItem(key);
     // 判断是否为空
-    if (item == null) {
+    if (item === null || item === undefined)  {
       return null;
     }
     // 不为空返回解析后的值
