@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build":"rimraf ./dist && cross-env NODE_ENV=production nest build --webpack --webpackPath=./webpack.config.js",
+    "build": "rimraf ./dist && cross-env NODE_ENV=production nest build --webpack --webpackPath=./webpack.config.js",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
@@ -32,7 +32,7 @@
     "@nestjs/swagger": "^7.1.13",
     "@nestjs/typeorm": "^10.0.0",
     "@nestjs/websockets": "^10.2.0",
-    "bcrypt": "^5.1.0",
+    "bcrypt": "^5.1.1",
     "chalk": "^4.0.0",
     "circular-json": "^0.5.9",
     "class-transformer": "^0.5.1",

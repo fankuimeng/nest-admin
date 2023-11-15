@@ -16,7 +16,6 @@ import { ConfigService } from '@nestjs/config';
 import winstonConfig from 'src/config/winston.config';
 import { Request, Response } from 'express';
 import { responseMessage } from 'src/utils';
-import { LogsQueryDto } from './dto/request.dto';
 
 @Injectable()
 export class LoggerService extends BaseService<Logger> {
@@ -32,7 +31,7 @@ export class LoggerService extends BaseService<Logger> {
   }
 
   generateWhere(
-    query:LogsQueryDto ,
+    query: PageQueryType<Logger> & { start_time: string; end_time: string },
     queryBuilder: SelectQueryBuilder<Logger>,
   ): void {
     const { name, start_time, end_time } = query;

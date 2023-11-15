@@ -88,7 +88,11 @@ async function bootstrap() {
     .setVersion(configService.get('SWAGGER_API_VERSION'))
     .build();
   const document = SwaggerModule.createDocument(app, options);
-  SwaggerModule.setup('doc', app, document);
+  SwaggerModule.setup('doc', app, document, {
+    swaggerOptions: {
+      cache: false,
+    },
+  });
 
   await app.listen(configService.get('APP_PROT'), () => {
     loggerService.logger(

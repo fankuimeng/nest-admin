@@ -14,15 +14,18 @@ import {
   EntityManager,
   EntityTarget,
 } from 'typeorm';
-import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
-import { PageQueryType } from 'src/typinng/global';
-import Page from 'src/common/Page';
+import {
+  InstanceEntities,
+  PageQueryType,
+  PageResModel,
+} from 'src/typinng/global';
 
 import {
   GetRepositoryTransactionReturnType,
   TransactionRepositoryOptions,
   getRepositoryTransaction,
 } from '.';
+import { generatePageResponseVo } from './dto/response.vo';
 
 export type ConditionsType<T> =
   | string
@@ -40,12 +43,14 @@ export type ConditionsType<T> =
  *
  */
 
+export const generateBaseService = (type: string): any => {};
+
 export abstract class BaseService<T extends ObjectLiteral> {
   transactionRepository: GetRepositoryTransactionReturnType<T>;
   repository: Repository<T>;
   constructor(
     manager: EntityManager,
-    readonly entity: EntityTarget<T>,
+    readonly entity: new () => T,
   ) {
     this.repository = manager.getRepository(entity);
     getRepositoryTransaction<T>(manager, entity).then(
@@ -76,14 +81,15 @@ export abstract class BaseService<T extends ObjectLiteral> {
     }, options);
   }
 
-  async page(query: PageQueryType<T>): Promise<Page<T>> {
+  async page(query: PageQueryType<T>): Promise<PageResModel<T>> {
+    const Page = generatePageResponseVo(this.entity);
     //  因为我需要的功能用mapper.find实现不了，所以采用createQueryBuilder
     let queryBuilder = this.repository.createQueryBuilder('t');
     this.generateWhere(query, queryBuilder);
     const { current, pageSize } = query;
     queryBuilder = queryBuilder.skip((current - 1) * pageSize).take(pageSize);
     const [records, total] = await queryBuilder.getManyAndCount();
-    return new Page(current, pageSize, total, records);
+    return new Page({ current, pageSize, total, records });
   }
 
   async saveMany(
@@ -120,22 +126,16 @@ export abstract class BaseService<T extends ObjectLiteral> {
     return this.repository.delete(options);
   }
 
-  async update(
-    conditions: ConditionsType<T>,
-    newValue: QueryDeepPartialEntity<T>,
-  ): Promise<number> {
+  async update(conditions: ConditionsType<T>, newValue: any): Promise<number> {
     let updateResult = 1;
     await this.repository
-      .update(conditions, newValue)
+      .update(conditions, newValue as any)
       .catch((e) => (updateResult = 0));
     return updateResult;
   }
 
   // 批量逻辑删除
-  async batchDelete(
-    ids: number[],
-    partialEntity: QueryDeepPartialEntity<T>,
-  ): Promise<UpdateResult> {
+  async batchDelete(ids: number[], partialEntity: any): Promise<UpdateResult> {
     // for循环 - 修改标记字段
     return await this.repository.update(ids, partialEntity);
   }

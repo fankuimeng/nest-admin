@@ -121,7 +121,7 @@ class OpenAPIGeneratorMockJs {
   }
 
   sampleFromSchema = (schema: any, propsName?: string[]) => {
-    const localSchema = schema.$ref
+    const localSchema = schema?.$ref
       ? utils.get(this.openAPI, schema.$ref.replace('#/', '').split('/'))
       : utils.objectify(schema);
 

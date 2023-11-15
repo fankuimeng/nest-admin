@@ -14,16 +14,15 @@ export class BaseEntities {
   @PrimaryGeneratedColumn()
   @IsOptional()
   @IsNumber()
-  id: number;
+  id?: number;
 
   @Column({
     name: 'create_time',
     type: 'timestamp',
     comment: '创建时间',
-
     default: () => 'CURRENT_TIMESTAMP',
   })
-  createTime: string;
+  createTime?: string;
 
   @Column({
     name: 'update_time',
@@ -32,7 +31,7 @@ export class BaseEntities {
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  updateTime: string;
+  updateTime?: string;
 
   @Column({ name: 'create_by', update: false, nullable: true })
   createBy?: string;
@@ -55,7 +54,7 @@ export class BaseEntities {
     nullable: true,
     default: 0,
   })
-  isDelete: number;
+  isDelete?: number;
 
   @Column('tinyint', {
     name: 'is_disable',
@@ -63,7 +62,7 @@ export class BaseEntities {
     width: 1,
     default: 0,
   })
-  isDisable: number;
+  isDisable?: number;
 
   // 你可以在实体中定义具有任何名称的方法，并使用@BeforeUpdate标记它，并且 TypeORM 将在使用 repository/manager save更新现有实
   // 体之前调用它。 但请记住，只有在模型中更改信息时才会出现这种情况。

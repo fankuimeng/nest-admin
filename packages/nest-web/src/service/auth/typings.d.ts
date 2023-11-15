@@ -4,7 +4,7 @@ declare namespace NESTADMIN {
   };
 
   type AuthLoginResponseType = {
-    userInfo: User;
+    userInfo?: User;
     refreshToken: string;
     accessToken: string;
   };

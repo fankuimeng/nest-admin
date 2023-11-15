@@ -25,10 +25,6 @@ module.exports = {
         exclude: /node_modules/,
       },
     //   {
-    //     test: /svg-captcha/,
-    //     use: path.resolve(__dirname, './loader/svgcaptcha.js'),
-    //   },
-    //   {
     //     test: /xlsx-style/,
     //     use: path.resolve(__dirname, './loader/xlsx.js'),
     //   },

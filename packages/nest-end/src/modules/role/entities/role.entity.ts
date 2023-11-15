@@ -1,6 +1,6 @@
 import { BaseEntities } from 'src/modules/base/entities/base.entity';
+import { Permission } from 'src/modules/user/entities/rermission.entity';
 import { Column, Entity, JoinTable, ManyToMany, OneToMany } from 'typeorm';
-import { Permission } from './rermission.entity';
 
 @Entity()
 export class Role extends BaseEntities {
@@ -21,5 +21,5 @@ export class Role extends BaseEntities {
   @JoinTable({
     name: 'role_permissions',
   })
-  permissions: Permission[];
+  permissions?: Permission[];
 }

@@ -48,6 +48,5 @@ export enum CODE_MESSAGE {
   "CODE_506" = "服务不可用，服务器暂时过载或维护。",
   "CODE_504" = "网关超时。",
   "CODE_FAIL" = "请求出错,请重新尝试",
-
   "CODE_ERROR" = "请求出错,请重新尝试",
 }

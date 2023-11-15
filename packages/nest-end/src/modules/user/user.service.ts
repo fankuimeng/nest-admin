@@ -6,8 +6,8 @@ import { BaseService } from '../base/base.service';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { RedisService } from '../redis/redis.service';
 import { md5, responseMessage } from 'src/utils';
-import { Role } from './entities/role.entity';
 import { Permission } from './entities/rermission.entity';
+import { Role } from '../role/entities/role.entity';
 
 @Injectable()
 export class UserService extends BaseService<User> {

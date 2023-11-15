@@ -11,11 +11,14 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './entities/user.entity';
-import { BaseController } from '../base/base.controller';
 import { AuthGuard } from '@nestjs/passport';
 import { SessionModel } from 'src/typinng/global';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UserCurrentResponseVo } from './dto/response.vo';
+import { generateBaseController } from '../base/base.controller';
+
+const BaseController = generateBaseController(User);
+
 @ApiTags('User-用户模块')
 @Controller('user')
 export class UserController extends BaseController<User> {
@@ -37,3 +40,4 @@ export class UserController extends BaseController<User> {
     return this.userService.currentUser(session);
   }
 }
+``;

@@ -1,7 +1,7 @@
 import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
 import { BaseEntities } from 'src/modules/base/entities/base.entity';
+import { Role } from 'src/modules/role/entities/role.entity';
 import { Column, Entity, JoinTable, ManyToMany, OneToMany } from 'typeorm';
-import { Role } from './role.entity';
 
 //  Contains, IsDate, IsEmail, IsFQDN, IsInt, Length, Max, Min;  class-validator
 @Entity()
@@ -21,7 +21,7 @@ export class User extends BaseEntities {
     comment: '邮箱号',
     length: 50,
   })
-  email: string | null;
+  email?: string | null;
 
   //电话号码
   @Column('tinyint', {
@@ -49,7 +49,7 @@ export class User extends BaseEntities {
     comment: '用户昵称',
     length: 50,
   })
-  nickname: string;
+  nickname?: string;
 
   @IsNotEmpty({
     message: '密码不能为空',
@@ -71,20 +71,20 @@ export class User extends BaseEntities {
     comment: '用户头像',
     length: 1024,
   })
-  avatar: string;
+  avatar?: string;
 
   @Column('varchar', {
     name: 'login_last_ip',
     nullable: true,
   })
-  loginLastIp: string;
+  loginLastIp?: string;
 
   @Column({
     type: 'date',
     nullable: true,
     name: 'login_last_time',
   })
-  loginLastTime: Date;
+  loginLastTime?: Date;
 
   @Column('varchar', {
     name: 'info',
@@ -92,7 +92,7 @@ export class User extends BaseEntities {
     comment: '用户简介',
     length: 255,
   })
-  info: string | null;
+  info?: string | null;
 
   @Column('tinyint', {
     comment: '是否是管理员',

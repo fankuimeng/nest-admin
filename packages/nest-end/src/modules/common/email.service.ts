@@ -18,8 +18,6 @@ export class EmailService {
     });
   }
   async sendMail({ to, subject, html }) {
-    console.log(to, subject, html);
-
     await this.transporter.sendMail({
       from: {
         name: this.configService.get('Email_NAME'),

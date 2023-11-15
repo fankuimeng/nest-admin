@@ -1,4 +1,4 @@
-import { ListBaseQueryDto } from 'src/modules/base/dto/response.dto';
+import { ListBaseQueryDto } from 'src/modules/base/dto/request.dto';
 import { BaseEntities } from 'src/modules/base/entities/base.entity';
 import { User } from 'src/modules/user/entities/user.entity';
 
@@ -12,12 +12,19 @@ export type ResData = Record<string, any>;
 /**
  * @description: 分页查询
  * @return {*}
- 
  */
+
 export type PageResModel<T> = {
+  records: Array<T>;
+  current: number;
+  pageSize: number;
   total: number;
-  list: T;
+  pageCount: number;
 };
+
+export type PageClassType<T> = new (
+  args: Omit<PageResModel<T>, 'pageCount'>,
+) => PageResModel<T>;
 
 /**
  * @description: Response 返回体，默认是不分页，如果是分页查询，需要自己将 Model 带入
@@ -42,7 +49,8 @@ export type SessionModel = {
 };
 
 export type InstanceEntities<T, U = BaseEntities> = Partial<T> & Partial<U>;
-
 export type PageQueryType<T, U = object> = ListBaseQueryDto &
   InstanceEntities<T> &
   U;
+
+// 获取基础的类型
