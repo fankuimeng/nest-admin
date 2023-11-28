@@ -1,7 +1,9 @@
 import {
+  ArgumentMetadata,
   Body,
   Delete,
   Get,
+  Inject,
   Param,
   Patch,
   Post,
@@ -9,6 +11,7 @@ import {
   Req,
   SetMetadata,
   UseGuards,
+  ValidationPipe as ValidationPipe1,
 } from '@nestjs/common';
 import {
   InstanceEntities,
@@ -25,17 +28,45 @@ import {
 } from '@nestjs/swagger';
 import { generateBaseResponseVo } from './dto/response.vo';
 import { BASE_REQUEST_DTO, BASE_RESPONSE_VO } from 'src/typinng/enum';
-import { BaseQueryDto, generateBaseRequestDto } from './dto/request.dto';
+import { generateBaseRequestDto } from './dto/request.dto';
+import { ApiProperty } from './dto/ApiProperty';
+import { ValidationPipe } from 'src/pipe';
+import { IsEmail, IsString } from 'class-validator';
 
 type BaseController<T> = {
   page(query?: PageQueryType<InstanceEntities<T>>): Promise<any>;
-  create(createUserDto: InstanceEntities<T>): Promise<any>;
+  create(createUserDto: any): Promise<any>;
   findAll(): Promise<any>;
   findOne(id: number): Promise<any>;
   update(id: number, updateUserDto: any): Promise<any>;
   remove(id: number): Promise<any>;
   batchDelete(ids: number[]): Promise<any>;
 };
+
+export function generateDtoClass(dtoProperties: Record<string, any>): any {
+  const dynamicDtoClass = class {};
+
+  for (const key in dtoProperties) {
+    if (dtoProperties.hasOwnProperty(key)) {
+      const value = dtoProperties[key];
+      ApiProperty({ required: value.required })(dynamicDtoClass.prototype, key);
+    }
+  }
+
+  return dynamicDtoClass;
+}
+
+class CreateUserDto {
+  @IsString()
+  username: string;
+
+  @IsString()
+  password: string;
+
+  @IsEmail()
+  email: string;
+}
+// const CreateUserDto = generateDtoClass(dtoProperties);
 
 export const generateBaseController = <T>(
   entity: new () => T,
@@ -59,6 +90,7 @@ export const generateBaseController = <T>(
     ): Promise<PageResModel<InstanceEntities<T>>> {
       return await this.service.page(query as any);
     }
+
     @ApiOkResponse({
       type: baseResponseVo[`${name}${BASE_RESPONSE_VO.CREATE}`],
     })
@@ -67,8 +99,15 @@ export const generateBaseController = <T>(
       type: baseRequestDto[`${name}${BASE_REQUEST_DTO.CREATE}`],
     })
     @Post()
-    async create(@Body() createUserDto: InstanceEntities<T>) {
-      return this.service.saveOne(createUserDto);
+    async create(
+      @Body()
+      createDto: InstanceEntities<T>,
+    ) {
+      const validationPipe = new ValidationPipe();
+      await validationPipe.transform(createDto, {
+        metatype: baseRequestDto[`${name}${BASE_REQUEST_DTO.CREATE}`],
+      } as any);
+      return this.service.saveOne(createDto);
     }
 
     @ApiOkResponse({ type: baseResponseVo[`${name}${BASE_RESPONSE_VO.ALL}`] })

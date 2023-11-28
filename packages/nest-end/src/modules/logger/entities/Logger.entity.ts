@@ -3,6 +3,9 @@ import { IsIP } from 'class-validator';
 import { BaseEntities } from 'src/modules/base/entities/base.entity';
 import { User } from 'src/modules/user/entities/user.entity';
 import { Column, Entity, JoinColumn, ManyToOne, BeforeUpdate } from 'typeorm';
+
+
+
 @Entity()
 export class Logger extends BaseEntities {
   // 日志内容

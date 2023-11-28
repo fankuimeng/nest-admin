@@ -96,19 +96,11 @@ export async function LoggerControllerPage(
   return request<NESTADMIN.LoggerPageResponseVo>('/logger/page', {
     method: 'GET',
     params: {
-      // isDisable has a default value: 1
-      isDisable: '1',
-      // id has a default value: 1
-      id: '1',
-
-      // updateTime has a default value: 2023-11-18 12:49:03
-      updateTime: '2023-11-18 12:49:03',
-      // createTime has a default value: 2023-11-18 12:49:03
-      createTime: '2023-11-18 12:49:03',
       // pageSize has a default value: 10
       pageSize: '10',
       // current has a default value: 1
       current: '1',
+
       ...params,
     },
     ...(options || {}),

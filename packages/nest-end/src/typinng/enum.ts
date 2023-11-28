@@ -3,6 +3,7 @@
  * @return {*}
  
  */
+
 export enum RES_MSG {
   SUCCESS = '操作成功！',
   FAILURE = '操作失败！',
@@ -18,6 +19,7 @@ export const EMPTY_RESPONSE_LIST = { list: [], total: 0 };
 export enum DATE_FORMATE {
   DATE = 'YYYY-MM-DD hh:mm:ss',
 }
+
 
 export enum BASE_RESPONSE_VO {
   PAGE = 'PageResponseVo',
@@ -40,3 +42,5 @@ export enum BASE_REQUEST_DTO {
   DELETE = 'DeleteRequestDto',
   DELETE_BATCH = 'BatchDeleteRequestDto',
 }
+
+

@@ -24,14 +24,9 @@ export function md5(str) {
   return hash.digest('hex');
 }
 
-// [PageResponseVo,DetailResponseVo,CheckResponseVo, CreateResponseVo]
-// return {
-
 // 根据name修改动态类名
-
 export const updateClass = (classList: (new () => void)[], moduleName) => {
   let classObject = {};
-
   classList.forEach((item) => {
     const name = `${moduleName}${item.name}`;
     classObject[`${name}`] = Object.defineProperty(item, 'name', {

@@ -3,13 +3,13 @@ import { AppModule } from './app.module';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import * as session from 'express-session';
-import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as express from 'express';
 import { join } from 'path';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { TimeoutInterceptor } from './interceptors/timeout.interceptor';
 import { LoggerService } from './modules/logger/logger.service';
+import { ValidationPipe } from './pipe';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {

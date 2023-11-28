@@ -1,7 +1,9 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { ApiProperty } from '@nestjs/swagger';
+import { BASE_RESPONSE_VO } from 'src/typinng/enum';
 import { PageClassType, PageResModel } from 'src/typinng/global';
 import { updateClass } from 'src/utils';
+import { CustomType } from 'src/utils/handlClass';
 
 export class ResponseVo<T = any> {
   @ApiProperty({
@@ -30,9 +32,15 @@ export const generatePageResponseVo = <T>(
   entity: new () => T,
 ): PageClassType<T> => {
   const name = entity.name;
+  const partialType = PartialType(entity);
+  const key = `${name}PageVo`;
+  const dataKey = `${name}PageDataVo`;
+  let obj = {
+    [dataKey]: class extends CustomType(entity, BASE_RESPONSE_VO.PAGE) {},
+  };
   class PageResponseVo {
     @ApiProperty({
-      type: entity,
+      type: [obj[dataKey]],
       description: `${name}模块-分页数据`,
       default: {},
     })
@@ -72,22 +80,22 @@ export const generatePageResponseVo = <T>(
       this.pageCount = Math.ceil(args.total / args.pageSize);
     }
   }
-  return PageResponseVo as unknown as PageClassType<T>;
+  obj = {
+    [key]: class extends PageResponseVo {},
+  } as any;
+  return obj[key] as unknown as PageClassType<T>;
 };
 
-export const generateBaseResponseVo = <T>(entity: new () => T): any => {
+export const generateBaseResponseVo = <T>(entity: new () => T) => {
   const name = entity.name;
-
   // 分页
   class PageResponseVo extends ResponseVo {
     @ApiProperty({
       type: generatePageResponseVo(entity),
       description: `${name}模块-分页响应体`,
-      default: {},
     })
     data?: T;
   }
-
   // 创建
   class CreateResponseVo extends ResponseVo {
     @ApiProperty({
@@ -101,7 +109,7 @@ export const generateBaseResponseVo = <T>(entity: new () => T): any => {
   // 详情
   class DetailResponseVo extends ResponseVo {
     @ApiProperty({
-      type: entity,
+      type: CustomType(entity, BASE_RESPONSE_VO.DETAIL),
       description: `${name}模块-查看详情响应体`,
       default: {},
     })
@@ -121,7 +129,7 @@ export const generateBaseResponseVo = <T>(entity: new () => T): any => {
   // 所有数据不分页
   class AllResponseVo extends ResponseVo {
     @ApiProperty({
-      type: [entity],
+      type: [class extends CustomType(entity, BASE_RESPONSE_VO.ALL) {}],
       description: `${name}模块-所有数据-不分页响应体`,
       default: {},
     })

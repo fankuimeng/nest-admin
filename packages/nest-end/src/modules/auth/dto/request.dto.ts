@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+
 export class AuthUserLoginDto {
   @ApiProperty({
     type: String,
@@ -29,6 +30,7 @@ export class AuthUserLoginDto {
   })
   email?: string;
 }
+
 
 export class AuthUserRegisterDto extends AuthUserLoginDto {
   @ApiProperty({

@@ -1,20 +1,31 @@
-import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
+import { Expose } from 'class-transformer';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsPhoneNumber,
+  IsString,
+  Length,
+  MinLength,
+  isString,
+} from 'class-validator';
+import {
+  ApiAllPropert,
+  ApiCommonPropert,
+  ApiProperty,
+  ApiUpdatePropert,
+} from 'src/modules/base/dto/ApiProperty';
 import { BaseEntities } from 'src/modules/base/entities/base.entity';
 import { Role } from 'src/modules/role/entities/role.entity';
 import { Column, Entity, JoinTable, ManyToMany, OneToMany } from 'typeorm';
 
 //  Contains, IsDate, IsEmail, IsFQDN, IsInt, Length, Max, Min;  class-validator
+
 @Entity()
 export class User extends BaseEntities {
   @IsNotEmpty({
     message: '邮箱不能为空',
   })
-  @IsEmail(
-    {},
-    {
-      message: '不是合法的邮箱格式',
-    },
-  )
+  @ApiAllPropert({ description: '邮箱' })
   @Column('varchar', {
     name: 'email',
     nullable: true,
@@ -24,6 +35,7 @@ export class User extends BaseEntities {
   email?: string | null;
 
   //电话号码
+  @IsPhoneNumber()
   @Column('tinyint', {
     name: 'phone',
     width: 11,
@@ -35,14 +47,16 @@ export class User extends BaseEntities {
   //电话号码
   @Column('int', {
     name: 'login_num',
-    comment: '手机号',
+    comment: '登录次数',
     default: 0,
   })
   loginNum?: number;
-
+  @IsString()
   @IsNotEmpty({
     message: '用户昵称不能为空',
   })
+  @Length(50)
+  @ApiUpdatePropert()
   @Column('varchar', {
     name: 'nickname',
     nullable: true,
@@ -65,6 +79,9 @@ export class User extends BaseEntities {
   })
   password?: string;
 
+  @IsString()
+  @Length(1024)
+  @ApiCommonPropert()
   @Column('varchar', {
     name: 'avatar',
     nullable: true,
@@ -73,12 +90,14 @@ export class User extends BaseEntities {
   })
   avatar?: string;
 
+  @ApiCommonPropert()
   @Column('varchar', {
     name: 'login_last_ip',
     nullable: true,
   })
   loginLastIp?: string;
 
+  @ApiCommonPropert()
   @Column({
     type: 'date',
     nullable: true,
@@ -86,6 +105,7 @@ export class User extends BaseEntities {
   })
   loginLastTime?: Date;
 
+  @ApiCommonPropert()
   @Column('varchar', {
     name: 'info',
     nullable: true,
@@ -94,6 +114,7 @@ export class User extends BaseEntities {
   })
   info?: string | null;
 
+  @ApiCommonPropert()
   @Column('tinyint', {
     comment: '是否是管理员',
     default: 0,

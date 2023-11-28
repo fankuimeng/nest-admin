@@ -1,4 +1,11 @@
-import { IsIn, IsNumber, IsOptional } from 'class-validator';
+import {
+  IsIn,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Length,
+} from 'class-validator';
 import * as dayjs from 'dayjs';
 import { RequestContext } from 'nestjs-request-context';
 import {
@@ -9,21 +16,34 @@ import {
   VersionColumn,
 } from 'typeorm';
 import { Request } from 'express';
+import { User } from 'src/modules/user/entities/user.entity';
+import {
+  ApiAllPropert,
+  ApiCommonPropert,
+  ApiProperty,
+} from '../dto/ApiProperty';
+import { CurrentTime } from 'src/typinng/constans';
 
 export class BaseEntities {
   @PrimaryGeneratedColumn()
   @IsOptional()
+  @IsNotEmpty({
+    message: 'ID不能为空',
+  })
   @IsNumber()
-  id?: number;
+  @ApiAllPropert()
+  id: number;
 
+  @ApiCommonPropert()
   @Column({
     name: 'create_time',
     type: 'timestamp',
     comment: '创建时间',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  createTime?: string;
+  createTime: string;
 
+  @ApiCommonPropert()
   @Column({
     name: 'update_time',
     comment: '更新时间',
@@ -31,55 +51,64 @@ export class BaseEntities {
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  updateTime?: string;
+  updateTime: string;
 
+  @IsString()
+  @ApiCommonPropert()
   @Column({ name: 'create_by', update: false, nullable: true })
-  createBy?: string;
+  createBy: string;
 
+  @IsString()
+  @ApiAllPropert()
   @Column({ type: 'varchar', nullable: true })
-  name?: string;
+  name: string;
 
+  @IsString()
+  @ApiCommonPropert()
   @Column({ name: 'update_by', nullable: true })
-  updateBy?: string;
+  updateBy: string;
 
+  @IsString()
+  @ApiProperty({
+    BaseRequestDto: ['UPDATE', 'CREATE'],
+    default: '备注',
+    type: String,
+    BaseResponseVo: ['PAGE', 'DETAIL', 'ALL', 'CHECK'],
+  })
   @Column({ type: 'varchar', nullable: true })
   remark?: string | undefined | null;
 
   @VersionColumn({ select: false, nullable: true })
-  version?: number;
+  version: number;
 
+  @IsNumber()
   @Column('tinyint', {
     name: 'is_delete',
     comment: '是否删除',
-    nullable: true,
-    default: 0,
   })
-  isDelete?: number;
+  isDelete: number;
 
+  @IsNumber()
   @Column('tinyint', {
     name: 'is_disable',
     comment: '是否禁用',
-    width: 1,
-    default: 0,
   })
-  isDisable?: number;
-
-  // 你可以在实体中定义具有任何名称的方法，并使用@BeforeUpdate标记它，并且 TypeORM 将在使用 repository/manager save更新现有实
-  // 体之前调用它。 但请记住，只有在模型中更改信息时才会出现这种情况。
-  // 如果运行save而不修改模型中的任何内容，
+  isDisable: number;
 
   @BeforeUpdate()
   public beforeUpdate() {
-    const request: Request = RequestContext.currentContext.req;
-    this.updateTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
-    this.updateBy = request.url + 'mfk';
+    const request: Request & { currentUser: User } =
+      RequestContext.currentContext.req;
+    this.updateTime = CurrentTime;
+    this.createBy = request.currentUser.name;
   }
   @BeforeInsert()
   public beforeInsert() {
-    const request: Request = RequestContext.currentContext.req;
-    this.createTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
-    this.updateTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
-    this.createBy = 'mfk' + request.path;
-    this.updateBy = request.url + 'mfk';
+    const request: Request & { currentUser: User } =
+      RequestContext.currentContext.req;
+    this.createTime = CurrentTime;
+    this.updateTime = CurrentTime;
+    this.createBy = request.currentUser.name;
+    this.updateBy = request.currentUser.name;
   }
 }

@@ -1,26 +1,27 @@
 declare namespace NESTADMIN {
   type User = {
-    email?: string;
-    phone?: string;
-    loginNum?: number;
-    nickname?: string;
-    password?: string;
-    avatar?: string;
-    loginLastIp?: string;
-    loginLastTime?: string;
-    info?: string;
-    isAdmin?: number;
-    roles?: Role[];
     id?: number;
     createTime?: string;
     updateTime?: string;
     createBy?: string;
-    name?: string;
+    name?: number;
     updateBy?: string;
     remark?: string;
-    version?: number;
-    isDelete?: number;
-    isDisable?: number;
+    /** 邮箱 */
+    email?: number;
+    nickname?: string;
+    avatar?: string;
+    loginLastIp?: string;
+    loginLastTime?: string;
+    info?: string;
+    isAdmin?: string;
+    phone?: string;
+    loginNum?: number;
+    password?: string;
+    roles?: Role[];
+    version: number;
+    isDelete: number;
+    isDisable: number;
   };
 
   type UserBatchDeleteRequestDto = {
@@ -36,24 +37,24 @@ declare namespace NESTADMIN {
   };
 
   type UserControllerPageParams = {
-    /** 名称 */
-    name?: string;
-    /** 是否禁用 */
-    isDisable?: number;
-    /** id */
-    id?: number;
-    /** 创建人 */
-    createBy?: string;
-    /** 更新人 */
-    updateBy?: string;
-    /** 更新时间 */
-    updateTime?: string;
-    /** 创建时间 */
-    createTime?: string;
     /** 条数 */
     pageSize?: number;
     /** 当前页码 */
     current?: number;
+    id?: number;
+    createTime?: string;
+    updateTime?: string;
+    createBy?: string;
+    name?: number;
+    updateBy?: string;
+    /** 邮箱 */
+    email?: number;
+    nickname?: string;
+    avatar?: string;
+    loginLastIp?: string;
+    loginLastTime?: string;
+    info?: string;
+    isAdmin?: string;
   };
 
   type UserControllerRemoveParams = {
@@ -66,26 +67,11 @@ declare namespace NESTADMIN {
 
   type UserCreateRequestDto = {
     id?: number;
-    createTime?: string;
-    updateTime?: string;
-    createBy?: string;
-    name?: string;
-    updateBy?: string;
+    name?: number;
     remark?: string;
-    version?: number;
-    isDelete?: number;
-    isDisable?: number;
-    email?: string;
-    phone?: string;
-    loginNum?: number;
+    /** 邮箱 */
+    email?: number;
     nickname?: string;
-    password?: string;
-    avatar?: string;
-    loginLastIp?: string;
-    loginLastTime?: string;
-    info?: string;
-    isAdmin?: number;
-    roles?: Role[];
   };
 
   /*User模块-创建响应体*/
@@ -102,31 +88,16 @@ declare namespace NESTADMIN {
 
   type UserUpdateRequestDto = {
     id?: number;
-    createTime?: string;
-    updateTime?: string;
-    createBy?: string;
-    name?: string;
-    updateBy?: string;
+    name?: number;
     remark?: string;
-    version?: number;
-    isDelete?: number;
-    isDisable?: number;
-    email?: string;
-    phone?: string;
-    loginNum?: number;
+    /** 邮箱 */
+    email?: number;
     nickname?: string;
-    password?: string;
-    avatar?: string;
-    loginLastIp?: string;
-    loginLastTime?: string;
-    info?: string;
-    isAdmin?: number;
-    roles?: Role[];
   };
 
   /*User模块-批量更新数据*/
   type UserUpdateResponseVo = ResponseVo<number[]>;
 
   /*User模块-所有数据-不分页响应体*/
-  type UserUserAllResponseVo = ResponseVo<User[]>;
+  type UserUserAllResponseVo = ResponseVo<CustomType[]>;
 }

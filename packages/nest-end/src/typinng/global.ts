@@ -1,6 +1,7 @@
 import { ListBaseQueryDto } from 'src/modules/base/dto/request.dto';
 import { BaseEntities } from 'src/modules/base/entities/base.entity';
 import { User } from 'src/modules/user/entities/user.entity';
+import { BASE_REQUEST_DTO, BASE_RESPONSE_VO } from './enum';
 
 /**
  * @description: 动态对象属性
@@ -54,3 +55,21 @@ export type PageQueryType<T, U = object> = ListBaseQueryDto &
   U;
 
 // 获取基础的类型
+
+
+
+//  所有value的集合
+// export type SwaggerDecoratorArgsType =  BASE_REQUEST_DTO | BASE_RESPONSE_VO
+
+
+
+
+export type SwaggerDecoratorArgsType = { BaseRequestDto?: (keyof typeof BASE_REQUEST_DTO)[]; BaseResponseVo?: (keyof typeof BASE_RESPONSE_VO)[] }
+
+// type AllRequestAndResponse = {
+//   [K in RequestAndResponseArray]: K;
+// }
+
+// export type SwaggerDecoratorArgsType = Array<typeof BASE_REQUEST_DTO[keyof typeof BASE_REQUEST_DTO] | typeof BASE_RESPONSE_VO[keyof typeof BASE_RESPONSE_VO]>;
+
+

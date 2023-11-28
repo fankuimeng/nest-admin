@@ -9,7 +9,7 @@ declare namespace NESTADMIN {
     accessToken: string;
   };
 
-  /*desc:用户注册, type:"AuthLoginResponseType" VO:"ResponseVo"*/
+  /*响应体*/
   type AuthLoginResponseVo = ResponseVo<AuthLoginResponseType>;
 
   type AuthRefreshTokenDto = {

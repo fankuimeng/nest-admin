@@ -1,18 +1,18 @@
 declare namespace NESTADMIN {
   type Role = {
-    code?: string;
-    describe?: string;
-    permissions?: Permission[];
     id?: number;
     createTime?: string;
     updateTime?: string;
     createBy?: string;
-    name?: string;
+    name?: number;
     updateBy?: string;
     remark?: string;
-    version?: number;
-    isDelete?: number;
-    isDisable?: number;
+    code?: string;
+    describe?: string;
+    permissions?: Permission[];
+    version: number;
+    isDelete: number;
+    isDisable: number;
   };
 
   type RoleBatchDeleteRequestDto = {
@@ -28,24 +28,16 @@ declare namespace NESTADMIN {
   };
 
   type RoleControllerPageParams = {
-    /** 名称 */
-    name?: string;
-    /** 是否禁用 */
-    isDisable?: number;
-    /** id */
-    id?: number;
-    /** 创建人 */
-    createBy?: string;
-    /** 更新人 */
-    updateBy?: string;
-    /** 更新时间 */
-    updateTime?: string;
-    /** 创建时间 */
-    createTime?: string;
     /** 条数 */
     pageSize?: number;
     /** 当前页码 */
     current?: number;
+    id?: number;
+    createTime?: string;
+    updateTime?: string;
+    createBy?: string;
+    name?: number;
+    updateBy?: string;
   };
 
   type RoleControllerRemoveParams = {
@@ -58,18 +50,8 @@ declare namespace NESTADMIN {
 
   type RoleCreateRequestDto = {
     id?: number;
-    createTime?: string;
-    updateTime?: string;
-    createBy?: string;
-    name?: string;
-    updateBy?: string;
+    name?: number;
     remark?: string;
-    version?: number;
-    isDelete?: number;
-    isDisable?: number;
-    code?: string;
-    describe?: string;
-    permissions?: Permission[];
   };
 
   /*Role模块-创建响应体*/
@@ -82,22 +64,12 @@ declare namespace NESTADMIN {
   type RolePageResponseVo = ResponseVo<PageResponseVo>;
 
   /*Role模块-所有数据-不分页响应体*/
-  type RoleRoleAllResponseVo = ResponseVo<Role[]>;
+  type RoleRoleAllResponseVo = ResponseVo<CustomType[]>;
 
   type RoleUpdateRequestDto = {
     id?: number;
-    createTime?: string;
-    updateTime?: string;
-    createBy?: string;
-    name?: string;
-    updateBy?: string;
+    name?: number;
     remark?: string;
-    version?: number;
-    isDelete?: number;
-    isDisable?: number;
-    code?: string;
-    describe?: string;
-    permissions?: Permission[];
   };
 
   /*Role模块-批量更新数据*/

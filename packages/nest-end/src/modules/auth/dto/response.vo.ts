@@ -30,7 +30,6 @@ export class AuthVerifyCodeResponseVo extends ResponseVo {
 export class AuthLoginResponseVo extends ResponseVo {
   @ApiProperty({
     type: AuthLoginResponseType,
-    description: 'desc:用户注册, type:"AuthLoginResponseType" VO:"ResponseVo"',
     default: { user: {}, refreshToken: '', accessToken: '' },
   })
   data: AuthLoginResponseType;
