@@ -11,7 +11,7 @@ export async function RedisControllerGetAllHashFields(
   const { key: param0, ...queryParams } = params;
   return request<NESTADMIN.Result>(`/redis/getAll/${param0}`, {
     method: 'GET',
-    params: { ...queryParams },
+    params,
     ...(options || {}),
   });
 }

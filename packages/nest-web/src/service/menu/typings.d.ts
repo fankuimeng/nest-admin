@@ -49,10 +49,38 @@ declare namespace NESTADMIN {
   type MenuDeleteResponseVo = ResponseVo<number>;
 
   /*Menu模块-所有数据-不分页响应体*/
-  type MenuMenuAllResponseVo = ResponseVo<CustomType[]>;
+  type MenuMenuAllResponseVo = ResponseVo<[]>;
+
+  type MenuPageDataVo = {
+    type?: string;
+    parentId?: string;
+    settting?: string;
+    id?: number;
+    createTime?: string;
+    updateTime?: string;
+    createBy?: string;
+    name?: string;
+    updateBy?: string;
+    version?: number;
+    isDelete?: number;
+    isDisable?: number;
+  };
 
   /*Menu模块-分页响应体*/
-  type MenuPageResponseVo = ResponseVo<PageResponseVo>;
+  type MenuPageResponseVo = ResponseVo<MenuPageVo>;
+
+  type MenuPageVo = {
+    /** Menu模块-分页数据 */
+    records: MenuPageDataVo[];
+    /** Menu模块-当前页 */
+    current: number;
+    /** Menu模块-分页大小 */
+    pageSize: number;
+    /** Menu模块-分页数 */
+    total: number;
+    /** Menu模块-分页数 */
+    pageCount: number;
+  };
 
   type MenuUpdateRequestDto = {
     id?: number;

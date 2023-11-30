@@ -106,7 +106,7 @@ export const generateBaseController = <T>(
       const validationPipe = new ValidationPipe();
       await validationPipe.transform(createDto, {
         metatype: baseRequestDto[`${name}${BASE_REQUEST_DTO.CREATE}`],
-      } as any);
+      } as ArgumentMetadata);
       return this.service.saveOne(createDto);
     }
 

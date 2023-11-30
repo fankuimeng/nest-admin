@@ -31,7 +31,7 @@ export const ApiProperty = (
   );
 };
 
-export const ApiAllPropert = (
+export const ApiAllProperty = (
   options?: ApiPropertyOptions & SwaggerDecoratorArgsType,
 ) => {
   return ApiProperty({
@@ -44,7 +44,7 @@ export const ApiAllPropert = (
   });
 };
 
-export const ApiCommonPropert = (
+export const ApiCommonProperty = (
   options?: ApiPropertyOptions & SwaggerDecoratorArgsType,
 ) => {
   return ApiProperty({
@@ -58,7 +58,7 @@ export const ApiCommonPropert = (
 };
 
 // 更新创建
-export const ApiUpdatePropert = (
+export const ApiUpdateProperty = (
   options?: ApiPropertyOptions & SwaggerDecoratorArgsType,
 ) => {
   return ApiProperty({

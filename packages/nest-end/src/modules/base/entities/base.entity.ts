@@ -18,8 +18,8 @@ import {
 import { Request } from 'express';
 import { User } from 'src/modules/user/entities/user.entity';
 import {
-  ApiAllPropert,
-  ApiCommonPropert,
+  ApiAllProperty,
+  ApiCommonProperty,
   ApiProperty,
 } from '../dto/ApiProperty';
 import { CurrentTime } from 'src/typinng/constans';
@@ -31,10 +31,10 @@ export class BaseEntities {
     message: 'ID不能为空',
   })
   @IsNumber()
-  @ApiAllPropert()
+  @ApiAllProperty()
   id: number;
 
-  @ApiCommonPropert()
+  @ApiCommonProperty()
   @Column({
     name: 'create_time',
     type: 'timestamp',
@@ -43,7 +43,7 @@ export class BaseEntities {
   })
   createTime: string;
 
-  @ApiCommonPropert()
+  @ApiCommonProperty()
   @Column({
     name: 'update_time',
     comment: '更新时间',
@@ -54,17 +54,17 @@ export class BaseEntities {
   updateTime: string;
 
   @IsString()
-  @ApiCommonPropert()
+  @ApiCommonProperty()
   @Column({ name: 'create_by', update: false, nullable: true })
   createBy: string;
 
   @IsString()
-  @ApiAllPropert()
+  @ApiAllProperty()
   @Column({ type: 'varchar', nullable: true })
   name: string;
 
   @IsString()
-  @ApiCommonPropert()
+  @ApiCommonProperty()
   @Column({ name: 'update_by', nullable: true })
   updateBy: string;
 
@@ -76,7 +76,12 @@ export class BaseEntities {
     BaseResponseVo: ['PAGE', 'DETAIL', 'ALL', 'CHECK'],
   })
   @Column({ type: 'varchar', nullable: true })
-  remark?: string | undefined | null;
+  @ApiProperty({
+    description: '备注',
+    BaseRequestDto: ['UPDATE'],
+    BaseResponseVo: ['PAGE', 'CHECK', 'DETAIL', 'ALL'],
+  })
+  remark?: string;
 
   @VersionColumn({ select: false, nullable: true })
   version: number;

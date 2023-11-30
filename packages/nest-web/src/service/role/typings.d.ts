@@ -60,11 +60,36 @@ declare namespace NESTADMIN {
   /*Role模块-删除数据*/
   type RoleDeleteResponseVo = ResponseVo<number>;
 
+  type RolePageDataVo = {
+    id?: number;
+    createTime?: string;
+    updateTime?: string;
+    createBy?: string;
+    name?: string;
+    updateBy?: string;
+    version?: number;
+    isDelete?: number;
+    isDisable?: number;
+  };
+
   /*Role模块-分页响应体*/
-  type RolePageResponseVo = ResponseVo<PageResponseVo>;
+  type RolePageResponseVo = ResponseVo<RolePageVo>;
+
+  type RolePageVo = {
+    /** Role模块-分页数据 */
+    records: RolePageDataVo[];
+    /** Role模块-当前页 */
+    current: number;
+    /** Role模块-分页大小 */
+    pageSize: number;
+    /** Role模块-分页数 */
+    total: number;
+    /** Role模块-分页数 */
+    pageCount: number;
+  };
 
   /*Role模块-所有数据-不分页响应体*/
-  type RoleRoleAllResponseVo = ResponseVo<CustomType[]>;
+  type RoleRoleAllResponseVo = ResponseVo<[]>;
 
   type RoleUpdateRequestDto = {
     id?: number;

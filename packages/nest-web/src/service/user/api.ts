@@ -34,7 +34,7 @@ export async function UserControllerFindOne(
   const { id: param0, ...queryParams } = params;
   return request<any>(`/user/${param0}`, {
     method: 'GET',
-    params: { ...queryParams },
+    params,
     ...(options || {}),
   });
 }
@@ -48,7 +48,7 @@ export async function UserControllerRemove(
   const { id: param0, ...queryParams } = params;
   return request<NESTADMIN.UserDeleteResponseVo>(`/user/${param0}`, {
     method: 'DELETE',
-    params: { ...queryParams },
+    params,
     ...(options || {}),
   });
 }
@@ -66,7 +66,7 @@ export async function UserControllerUpdate(
     headers: {
       'Content-Type': 'application/json',
     },
-    params: { ...queryParams },
+    params,
     data: body,
     ...(options || {}),
   });
@@ -111,14 +111,7 @@ export async function UserControllerPage(
 ) {
   return request<NESTADMIN.UserPageResponseVo>('/user/page', {
     method: 'GET',
-    params: {
-      // pageSize has a default value: 10
-      pageSize: '10',
-      // current has a default value: 1
-      current: '1',
-
-      ...params,
-    },
+    params,
     ...(options || {}),
   });
 }

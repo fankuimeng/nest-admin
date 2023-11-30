@@ -32,7 +32,6 @@ export const generatePageResponseVo = <T>(
   entity: new () => T,
 ): PageClassType<T> => {
   const name = entity.name;
-  const partialType = PartialType(entity);
   const key = `${name}PageVo`;
   const dataKey = `${name}PageDataVo`;
   let obj = {

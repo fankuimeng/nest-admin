@@ -1,18 +1,15 @@
-import { Expose } from 'class-transformer';
 import {
-  IsEmail,
   IsNotEmpty,
   IsPhoneNumber,
   IsString,
   Length,
   MinLength,
-  isString,
 } from 'class-validator';
 import {
-  ApiAllPropert,
-  ApiCommonPropert,
+  ApiAllProperty,
+  ApiCommonProperty,
   ApiProperty,
-  ApiUpdatePropert,
+  ApiUpdateProperty,
 } from 'src/modules/base/dto/ApiProperty';
 import { BaseEntities } from 'src/modules/base/entities/base.entity';
 import { Role } from 'src/modules/role/entities/role.entity';
@@ -25,7 +22,7 @@ export class User extends BaseEntities {
   @IsNotEmpty({
     message: '邮箱不能为空',
   })
-  @ApiAllPropert({ description: '邮箱' })
+  @ApiAllProperty({ description: '邮箱' })
   @Column('varchar', {
     name: 'email',
     nullable: true,
@@ -56,7 +53,7 @@ export class User extends BaseEntities {
     message: '用户昵称不能为空',
   })
   @Length(50)
-  @ApiUpdatePropert()
+  @ApiUpdateProperty()
   @Column('varchar', {
     name: 'nickname',
     nullable: true,
@@ -65,23 +62,20 @@ export class User extends BaseEntities {
   })
   nickname?: string;
 
-  @IsNotEmpty({
-    message: '密码不能为空',
-  })
-  @MinLength(6, {
-    message: '密码不能少于 6 位',
-  })
+  @IsString()
+  @Length(1024)
+  @ApiCommonProperty()
   @Column('varchar', {
     name: 'password',
-    comment: '密码',
-    select: false,
-    length: 255,
+    nullable: true,
+    comment: '用户密码',
+    length: 1024,
   })
   password?: string;
 
   @IsString()
   @Length(1024)
-  @ApiCommonPropert()
+  @ApiCommonProperty()
   @Column('varchar', {
     name: 'avatar',
     nullable: true,
@@ -90,14 +84,14 @@ export class User extends BaseEntities {
   })
   avatar?: string;
 
-  @ApiCommonPropert()
+  @ApiCommonProperty()
   @Column('varchar', {
     name: 'login_last_ip',
     nullable: true,
   })
   loginLastIp?: string;
 
-  @ApiCommonPropert()
+  @ApiCommonProperty()
   @Column({
     type: 'date',
     nullable: true,
@@ -105,7 +99,7 @@ export class User extends BaseEntities {
   })
   loginLastTime?: Date;
 
-  @ApiCommonPropert()
+  @ApiCommonProperty()
   @Column('varchar', {
     name: 'info',
     nullable: true,
@@ -114,7 +108,7 @@ export class User extends BaseEntities {
   })
   info?: string | null;
 
-  @ApiCommonPropert()
+  @ApiCommonProperty()
   @Column('tinyint', {
     comment: '是否是管理员',
     default: 0,

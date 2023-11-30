@@ -83,8 +83,41 @@ declare namespace NESTADMIN {
   /*User模块-删除数据*/
   type UserDeleteResponseVo = ResponseVo<number>;
 
+  type UserPageDataVo = {
+    /** 邮箱 */
+    email?: number;
+    nickname?: string;
+    avatar?: string;
+    loginLastIp?: string;
+    loginLastTime?: string;
+    info?: string;
+    isAdmin?: string;
+    id?: number;
+    createTime?: string;
+    updateTime?: string;
+    createBy?: string;
+    name?: string;
+    updateBy?: string;
+    version?: number;
+    isDelete?: number;
+    isDisable?: number;
+  };
+
   /*User模块-分页响应体*/
-  type UserPageResponseVo = ResponseVo<PageResponseVo>;
+  type UserPageResponseVo = ResponseVo<UserPageVo>;
+
+  type UserPageVo = {
+    /** User模块-分页数据 */
+    records: UserPageDataVo[];
+    /** User模块-当前页 */
+    current: number;
+    /** User模块-分页大小 */
+    pageSize: number;
+    /** User模块-分页数 */
+    total: number;
+    /** User模块-分页数 */
+    pageCount: number;
+  };
 
   type UserUpdateRequestDto = {
     id?: number;
@@ -99,5 +132,5 @@ declare namespace NESTADMIN {
   type UserUpdateResponseVo = ResponseVo<number[]>;
 
   /*User模块-所有数据-不分页响应体*/
-  type UserUserAllResponseVo = ResponseVo<CustomType[]>;
+  type UserUserAllResponseVo = ResponseVo<[]>;
 }

@@ -6,7 +6,7 @@ import { Column, Entity, JoinTable, ManyToMany, OneToMany } from 'typeorm';
 export class Role extends BaseEntities {
   //角色编码
   @Column({ type: 'varchar', length: 20, nullable: true, comment: '角色编码' })
-  code?: string;
+  code: string;
 
   //角色描述
   @Column({
@@ -15,7 +15,7 @@ export class Role extends BaseEntities {
     comment: '角色描述',
     nullable: true,
   })
-  describe?: string;
+  describe: string;
 
   @ManyToMany(() => Permission)
   @JoinTable({

@@ -11,7 +11,7 @@ export async function CommonControllerGetAllHashFields(
   const { key: param0, ...queryParams } = params;
   return request<NESTADMIN.Result>(`/conmon/getAll/${param0}`, {
     method: 'GET',
-    params: { ...queryParams },
+    params,
     ...(options || {}),
   });
 }

@@ -34,7 +34,7 @@ export async function LoggerControllerFindOne(
   const { id: param0, ...queryParams } = params;
   return request<any>(`/logger/${param0}`, {
     method: 'GET',
-    params: { ...queryParams },
+    params,
     ...(options || {}),
   });
 }
@@ -48,7 +48,7 @@ export async function LoggerControllerRemove(
   const { id: param0, ...queryParams } = params;
   return request<NESTADMIN.LoggerDeleteResponseVo>(`/logger/${param0}`, {
     method: 'DELETE',
-    params: { ...queryParams },
+    params,
     ...(options || {}),
   });
 }
@@ -66,7 +66,7 @@ export async function LoggerControllerUpdate(
     headers: {
       'Content-Type': 'application/json',
     },
-    params: { ...queryParams },
+    params,
     data: body,
     ...(options || {}),
   });
@@ -95,14 +95,7 @@ export async function LoggerControllerPage(
 ) {
   return request<NESTADMIN.LoggerPageResponseVo>('/logger/page', {
     method: 'GET',
-    params: {
-      // pageSize has a default value: 10
-      pageSize: '10',
-      // current has a default value: 1
-      current: '1',
-
-      ...params,
-    },
+    params,
     ...(options || {}),
   });
 }

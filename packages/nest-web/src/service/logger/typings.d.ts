@@ -45,10 +45,43 @@ declare namespace NESTADMIN {
   type LoggerDeleteResponseVo = ResponseVo<number>;
 
   /*Logger模块-所有数据-不分页响应体*/
-  type LoggerLoggerAllResponseVo = ResponseVo<CustomType[]>;
+  type LoggerLoggerAllResponseVo = ResponseVo<[]>;
+
+  type LoggerPageDataVo = {
+    id?: number;
+    createTime?: string;
+    updateTime?: string;
+    createBy?: string;
+    name?: number;
+    updateBy?: string;
+    remark?: string;
+    version?: number;
+    isDelete?: number;
+    isDisable?: number;
+    ip?: string;
+    path?: string;
+    user_agent?: string;
+    params?: Record<string, any>;
+    method?: string;
+    api_url?: string;
+    userInfo?: User;
+  };
 
   /*Logger模块-分页响应体*/
-  type LoggerPageResponseVo = ResponseVo<PageResponseVo>;
+  type LoggerPageResponseVo = ResponseVo<LoggerPageVo>;
+
+  type LoggerPageVo = {
+    /** Logger模块-分页数据 */
+    records: LoggerPageDataVo[];
+    /** Logger模块-当前页 */
+    current: number;
+    /** Logger模块-分页大小 */
+    pageSize: number;
+    /** Logger模块-分页数 */
+    total: number;
+    /** Logger模块-分页数 */
+    pageCount: number;
+  };
 
   type LoggerUpdateRequestDto = {
     id?: number;
